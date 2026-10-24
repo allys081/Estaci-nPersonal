@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mi Estación · Renaico & Instituto</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bgCanvas: '#0e0d13',
+            cardBase: '#171520',
+            cardElevated: '#1f1c2b',
+            borderSubtle: '#2c273d',
+            goldAccent: '#d4af37',
+            goldSoft: '#f5deb3',
+            roseAccent: '#e08ca3',
+            purpleAccent: '#9d7cd8',
+            emeraldAccent: '#10b981',
+            textMain: '#f3eef8',
+            textMuted: '#948a9f'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #0e0d13;
+      color: #f3eef8;
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e0d13;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2c273d;
+      border-radius: 99px;
+    }
+
+    .strikethrough-title {
+      text-decoration: line-through;
+      opacity: 0.55;
+    }
+
+    .gold-glow {
+      box-shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.22);
+    }
+
+    .purple-glow {
+      box-shadow: 0 4px 20px -2px rgba(157, 124, 216, 0.25);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-32 select-none antialiased">
+
+  <!-- Mobile Top Bar with Navigation and Backup -->
+  <header class="sticky top-0 z-40 bg-[#0e0d13]/92 backdrop-blur-md border-b border-borderSubtle px-4 pt-3 pb-3">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <span class="text-2xl" id="headerIcon">🏡</span>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-textMain leading-none font-['Plus_Jakarta_Sans']" id="headerTitle">
+            Traslado a Renaico
+          </h1>
+          <p class="text-[11px] text-textMuted mt-0.5" id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="flex items-center space-x-1.5">
+        <button onclick="exportData()" title="Respaldar JSON" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-goldAccent active:scale-95 transition-all text-xs flex items-center gap-1">
+          💾
+        </button>
+        <button onclick="toggleSearch()" title="Buscar" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-textMain active:scale-95 transition-all text-xs">
+          🔍
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible Search Input -->
+    <div id="searchContainer" class="max-w-md mx-auto hidden mt-2.5">
+      <div class="relative">
+        <input 
+          type="text" 
+          id="globalSearchInput" 
+          placeholder="Buscar tareas, tips, apuntes o equipaje..." 
+          oninput="handleSearch(this.value)"
+          class="w-full bg-cardBase border border-borderSubtle rounded-xl py-2 px-3 pl-8 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent transition"
+        >
+        <span class="absolute left-2.5 top-2.5 text-xs text-textMuted">🔎</span>
+        <button onclick="clearSearch()" class="absolute right-2.5 top-2 text-xs text-textMuted hover:text-textMain">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar (Only visible in Checklist mode / Renaico) -->
+  <section id="progressSection" class="max-w-md mx-auto px-4 mt-3">
+    <div class="bg-cardBase border border-borderSubtle rounded-2xl p-3.5 shadow-sm">
+      <div class="flex justify-between items-center mb-1.5 text-xs font-semibold">
+        <span class="text-textMuted flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+          Equipaje empacado
+        </span>
+        <span id="progressText" class="text-emeraldAccent font-mono font-bold">0% (0/0)</span>
+      </div>
+      <div class="w-full bg-cardElevated rounded-full h-2 overflow-hidden border border-borderSubtle/60">
+        <div id="progressBar" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+
+      <!-- Quick Reset Button for Traveling -->
+      <div class="flex justify-between items-center mt-2.5 pt-2 border-t border-borderSubtle/60 text-[11px]">
+        <span class="text-textMuted">¿Nuevo viaje a Renaico?</span>
+        <button onclick="resetPackingChecklist()" class="text-emerald-400 font-semibold hover:underline active:scale-95 transition flex items-center gap-1">
+          🔄 Desmarcar todo para viajar
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hint helper -->
+  <div class="max-w-md mx-auto px-4 mt-2">
+    <p class="text-[11px] text-textMuted/80 italic flex items-center gap-1">
+      <span>💡</span> <span>Toca cualquier tarea para <b>desplegar el detalle completo</b>.</span>
+    </p>
+  </div>
+
+  <!-- Main Dynamic View Container -->
+  <main class="max-w-md mx-auto px-4 mt-2.5 space-y-3" id="mainContentArea">
+    <!-- Loaded dynamically based on active tab -->
+  </main>
+
+  <!-- Floating Add Button -->
+  <div class="fixed bottom-20 right-4 z-30 max-w-md mx-auto">
+    <button onclick="openAddItemModal()" class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-br from-purpleAccent to-roseAccent text-white shadow-xl shadow-purpleAccent/25 border border-white/20 active:scale-90 transition-all flex items-center justify-center font-bold text-lg">
+      ➕
+    </button>
+  </div>
+
+  <!-- Bottom App Navigation Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-[#0e0d13]/95 backdrop-blur-lg border-t border-borderSubtle px-6 py-2.5">
+    <div class="max-w-md mx-auto grid grid-cols-2 gap-3">
+      <!-- Tab 1: Renaico -->
+      <button 
+        id="tabBtnRenaico" 
+        onclick="switchTab('renaico')" 
+        class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 gold-glow bg-emeraldAccent/10 border border-emeraldAccent/40 text-emerald-400">
+        <span class="text-xl">🏡</span>
+        <span class="text-xs font-semibold mt-0.5 tracking-tight font-['Plus_Jakarta_Sans']">Renaico</span>
+      </button>
+
+      <!-- Tab 2: Instituto -->
+      <button 
+        id="tabBtnInstituto" 
+        onclick="switchTab('instituto')" 
+        class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent">
+        <span class="text-xl">🎓</span>
+        <span class="text-xs font-semibold mt-0.5 tracking-tight font-['Plus_Jakarta_Sans']">Instituto</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Modal: Agregar Tarea con Resumen & Detalle Desplegable -->
+  <div id="modalAddItem" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl transition-all">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] flex items-center gap-2">
+          <span>✨</span> <span id="modalTitle">Nueva Tarea / Item</span>
+        </h3>
+        <button onclick="closeAddItemModal()" class="w-8 h-8 rounded-full bg-cardElevated flex items-center justify-center text-textMuted hover:text-textMain">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-textMuted font-medium mb-1">Título principal</label>
+          <input 
+            type="text" 
+            id="newItemTitle" 
+            placeholder="Ej: Computador y periféricos, Repaso 3 días antes..." 
+            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent"
+          >
+        </div>
+
+        <div>
+          <label class="block text-textMuted font-medium mb-1">Resumen corto (visible siempre)</label>
+          <input 
+            type="text" 
+            id="newItemSummary" 
+            placeholder="Ej: Cargador + mouse + dongle, 45m estudio / 15m descanso..." 
+            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent"
+          >
+        </div>
+
+        <div>
+          <label class="block text-textMuted font-medium mb-1">Categoría</label>
+          <select id="newItemCategory" class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2 text-xs text-textMain focus:outline-none focus:border-goldAccent">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-textMuted font-medium mb-1">Detalle completo (al tocar la tarea)</label>
+          <textarea 
+            id="newItemDetail" 
+            rows="3"
+            placeholder="Escribe todo lo que no debes olvidar: pasos, precauciones, dónde está guardado, notas importantes..." 
+            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent resize-none"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <button onclick="closeAddItemModal()" class="w-full py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
+        <button onclick="saveNewItem()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purpleAccent to-goldAccent text-white font-bold text-xs shadow-lg shadow-purpleAccent/20">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastMessage" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-cardElevated border border-borderSubtle text-textMain px-4 py-2 rounded-2xl shadow-xl text-xs font-medium opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
+    <span id="toastIcon">✨</span>
+    <span id="toastText">Acción realizada</span>
+  </div>
+
+  <script>
+    // --- DATOS INICIALES CON MODELO RESUMEN + DETALLE COMPLETO DESPLEGABLE ---
+    const DEFAULT_DATA = {
+      renaico: [
+        // Tecnológico
+        { 
+          id: 'r1', 
+          cat: 'llevar_tec', 
+          title: 'Computador y estación de trabajo', 
+          summary: 'Cargador original, mouse y soporte', 
+          detail: '• Revisar cargador de alta potencia (no dejar el transformador en el enchufe).\n• Mouse inalámbrico + pila de repuesto.\n• Reposa muñeca ergonómico.\n• Dongle o conector USB multipuertos.\n• Audífonos bluetooth con estuche cargado.',
+          checked: true 
+        },
+        { 
+          id: 'r2', 
+          cat: 'llevar_tec', 
+          title: 'Cargadores y periféricos de celular', 
+          summary: 'Cables USB-C, adaptadores y apoya teléfono', 
+          detail: '• Llevar soporte para ver clases o videos sin cansancio de cuello.\n• Al menos 2 cables USB-C en buen estado.\n• Bloque de carga rápida para la noche.',
+          checked: true 
+        },
+
+        // Skincare & Aseo Personal
+        { 
+          id: 'r3', 
+          cat: 'llevar_skin', 
+          title: 'Rutina básica de Skincare', 
+          summary: 'Limpiador, hidratante y bloqueador solar', 
+          detail: '• Limpiador facial suave (envase bien cerrado para no derramar en la mochila).\n• Crema hidratante facial para el cambio de clima.\n• Bloqueador solar factor 50 (muy importante para reaplicar en el día).\n• Bálsamo labial o serum nocturno.',
+          checked: true 
+        },
+        { 
+          id: 'r4', 
+          cat: 'llevar_skin', 
+          title: 'Neceser de aseo y cuidado personal', 
+          summary: 'Cepillo, toalla de mano y artículos diarios', 
+          detail: '• Cepillo de dientes con protector.\n• Pasta dental de viaje.\n• Desodorante y peine de pelo.\n• Gotitas para ojos o medicamentos de rutina si hacen falta.',
+          checked: false 
+        },
+
+        // Material & Estudio
+        { 
+          id: 'r5', 
+          cat: 'llevar_mat', 
+          title: 'Cuadernos y estuche universitario', 
+          summary: 'Cuaderno principal, destacadores y post-its', 
+          detail: '• Cuaderno de apuntes principal con materias del semestre.\n• Destacadores pasteles y bolígrafos negros/azules.\n• Notas adhesivas (post-its) para marcar lecturas o páginas clave.',
+          checked: true 
+        },
+
+        // Ya está en Renaico (Para no duplicar peso)
+        { 
+          id: 'r6', 
+          cat: 'ya_en_renaico', 
+          title: 'Secador de pelo & plancha', 
+          summary: 'Guardado en el clóset de la pieza', 
+          detail: 'No empacar desde la casa principal porque ya quedó uno listo y operativo en Renaico.',
+          checked: true 
+        },
+        { 
+          id: 'r7', 
+          cat: 'ya_en_renaico', 
+          title: 'Ropa abrigada de reserva', 
+          summary: 'Chalecos, pantuflas y almohada', 
+          detail: 'Están en el ropero de la habitación. Solo llevar ropa para la cantidad exacta de días que dura la estadía.',
+          checked: true 
+        },
+
+        // Pendientes mientras estoy allá
+        { 
+          id: 'r8', 
+          cat: 'pendientes_alla', 
+          title: 'Revisar PC de la Junaeb', 
+          summary: 'Buscar cuaderno de telecomunicaciones', 
+          detail: 'Encender el PC, revisar la carpeta de descargas y documentos para rescatar apuntes anteriores y guías del ramo.',
+          checked: true 
+        },
+        { 
+          id: 'r9', 
+          cat: 'pendientes_alla', 
+          title: 'Organizar apuntes y sincronizar Drive', 
+          summary: 'Limpiar descargas y ordenar carpetas', 
+          detail: 'Aprovechar la calma para ordenar archivos por materia y verificar que todo esté respaldado en la nube.',
+          checked: false 
+        },
+
+        // Comprar allá y dónde ponerlo
+        { 
+          id: 'r10', 
+          cat: 'comprar_alla', 
+          title: 'Caja organizadora plástica', 
+          summary: 'Para ordenar cables y útiles en Renaico', 
+          detail: 'Comprar en bazar o supermercado local para dejar un rincón fijo de estudio sin cables enredados.',
+          checked: false 
+        }
+      ],
+
+      instituto: [
+        // Estudio & Enfoque TDAH-Friendly
+        { 
+          id: 'i1', 
+          cat: 'estudio', 
+          title: 'Bloques de enfoque: 45 min estudio / 15 min descanso', 
+          summary: '1 o 2 bloques diarios por ramo difícil', 
+          detail: '• Poner temporizador visible (sin mirar notificaciones de redes sociales).\n• Durante los 45m: solo un tema específico.\n• En los 15m de descanso: pararse, tomar agua o caminar (no quedarse pegada en la pantalla).',
+          checked: false 
+        },
+        { 
+          id: 'i2', 
+          cat: 'estudio', 
+          title: 'Técnica de Pizarra / Explicación activa', 
+          summary: 'Explicar conceptos en voz alta o diagramar', 
+          detail: '• Escribir mapas mentales en pizarra o cuaderno borrador.\n• Explicar la materia como si se la enseñaras a alguien que no sabe nada.\n• Si te trabas en una parte, ahí está el vacío que hay que releer.',
+          checked: false 
+        },
+        { 
+          id: 'i3', 
+          cat: 'estudio', 
+          title: 'Resúmenes semanales compactos', 
+          summary: 'No dejar acumular para la semana de prueba', 
+          detail: 'Dedicar 30 minutos los viernes o domingos a resumir las ideas clave de cada clase de la semana.',
+          checked: false 
+        },
+
+        // Evaluaciones & Bienestar
+        { 
+          id: 'i4', 
+          cat: 'evaluaciones', 
+          title: 'Sueño reparador pre-prueba', 
+          summary: 'Dormir mínimo 7h 30m la noche anterior', 
+          detail: 'Estudiar de noche sin dormir sabotea la memoria de trabajo. Dormir fija los conceptos en el cerebro.',
+          checked: false 
+        },
+        { 
+          id: 'i5', 
+          cat: 'evaluaciones', 
+          title: 'Protocolo de estudio con 3 días de anticipación', 
+          summary: 'Simulacros y ejercicios tipo certamen', 
+          detail: '• Día 3 antes: Repaso de conceptos y fórmulas.\n• Día 2 antes: Resolver guías y exámenes de años anteriores sin mirar respuestas.\n• Día 1 antes: Repaso ligero y descanso mental temprano.',
+          checked: false 
+        },
+
+        // Estructura & Organización Semestral
+        { 
+          id: 'i6', 
+          cat: 'estructura', 
+          title: 'Descarga y análisis de programas de ramos', 
+          summary: 'Ponderaciones de tests, certámenes y talleres', 
+          detail: 'Anotar en el calendario qué porcentaje vale cada evaluación y los requisitos de asistencia o eximición.',
+          checked: true 
+        },
+        { 
+          id: 'i7', 
+          cat: 'estructura', 
+          title: 'Creación de carpetas dedicadas en Drive', 
+          summary: '1 carpeta por asignatura con guías y lecturas', 
+          detail: 'Estructura recomendada: /Semestre -> /Nombre Ramo -> /Guías, /Apuntes, /Evaluaciones.',
+          checked: true 
+        },
+
+        // Toma de Ramos & Matrícula
+        { 
+          id: 'i8', 
+          cat: 'toma_ramos', 
+          title: 'Verificación de prelaciones (ramos requisito)', 
+          summary: 'Asegurar continuidad de la malla', 
+          detail: 'Revisar qué asignaturas abren los ramos clave del próximo semestre para priorizar sus cupos primero.',
+          checked: true 
+        },
+        { 
+          id: 'i9', 
+          cat: 'toma_ramos', 
+          title: 'Plan A y Plan B de horarios y secciones', 
+          summary: 'Evitar topes y ventanas excesivas', 
+          detail: 'Tener pre-armados dos horarios alternativos con los códigos de sección por si la primera opción se agota.',
+          checked: true 
+        }
+      ]
+    };
+
+    // Categorías de Renaico
+    const RENAICO_CATEGORIES = {
+      llevar_tec: { name: '💻 Tecnológico & Cables', icon: '🔌' },
+      llevar_skin: { name: '🧴 Skincare & Aseo', icon: '✨' },
+      llevar_mat: { name: '📚 Material & Cuadernos', icon: '📝' },
+      ya_en_renaico: { name: '🏠 Ya está en Renaico (No empacar)', icon: '📦' },
+      pendientes_alla: { name: '📌 Pendientes mientras estoy allá', icon: '⏳' },
+      comprar_alla: { name: '🛒 Comprar allá y ubicar', icon: '🛍️' }
+    };
+
+    // Categorías de Instituto
+    const INSTITUTO_CATEGORIES = {
+      estudio: { name: '🧠 Enfoque & Hábitos de Estudio', icon: '📖' },
+      evaluaciones: { name: '🎯 Evaluaciones & Bienestar', icon: '🌙' },
+      estructura: { name: '📋 Estructura & Organización', icon: '🗂️' },
+      toma_ramos: { name: '🎓 Toma de Ramos & Planificación', icon: '⚖️' }
+    };
+
+    // Estado en memoria
+    let currentTab = 'renaico';
+    let searchQuery = '';
+    let expandedCards = {}; // Recordar qué tarjetas de detalle están abiertas
+    let appData = JSON.parse(localStorage.getItem('estacion_detallada_data') || JSON.stringify(DEFAULT_DATA));
+
+    function saveData() {
+      localStorage.setItem('estacion_detallada_data', JSON.stringify(appData));
+      updateProgress();
+    }
+
+    function showToast(text, icon = '✨') {
+      const toast = document.getElementById('toastMessage');
+      document.getElementById('toastText').innerText = text;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2000);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      const btnRen = document.getElementById('tabBtnRenaico');
+      const btnInst = document.getElementById('tabBtnInstituto');
+      const headerTitle = document.getElementById('headerTitle');
+      const headerSubtitle = document.getElementById('headerSubtitle');
+      const headerIcon = document.getElementById('headerIcon');
+      const progressSection = document.getElementById('progressSection');
+
+      if (tab === 'renaico') {
+        btnRen.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 gold-glow bg-emeraldAccent/10 border border-emeraldAccent/40 text-emerald-400";
+        btnInst.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent";
+        headerTitle.innerText = "Traslado a Renaico";
+        headerSubtitle.innerText = "Resumen & detalle para no olvidar nada";
+        headerIcon.innerText = "🏡";
+        progressSection.classList.remove('hidden');
+      } else {
+        btnInst.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 purple-glow bg-purpleAccent/10 border border-purpleAccent/40 text-purpleAccent";
+        btnRen.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent";
+        headerTitle.innerText = "Instituto & Estrategia";
+        headerSubtitle.innerText = "Guía paso a paso y métodos de estudio";
+        headerIcon.innerText = "🎓";
+        progressSection.classList.add('hidden');
+      }
+
+      renderContent();
+    }
+
+    // Toggle para desplegar / contraer el detalle de una tarea específica
+    function toggleCardDetail(id) {
+      expandedCards[id] = !expandedCards[id];
+      renderContent();
+      if (navigator.vibrate) navigator.vibrate(8);
+    }
+
+    // Checkbox toggle
+    function toggleCheck(id, e) {
+      if (e) e.stopPropagation();
+      const list = appData[currentTab];
+      const item = list.find(x => x.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        saveData();
+        renderContent();
+        if (item.checked && navigator.vibrate) navigator.vibrate(18);
+      }
+    }
+
+    function deleteItem(id, e) {
+      if (e) e.stopPropagation();
+      appData[currentTab] = appData[currentTab].filter(x => x.id !== id);
+      saveData();
+      renderContent();
+      showToast('Elemento eliminado', '🗑️');
+    }
+
+    function resetPackingChecklist() {
+      appData.renaico.forEach(item => {
+        if (item.cat.startsWith('llevar_')) {
+          item.checked = false;
+        }
+      });
+      saveData();
+      renderContent();
+      showToast('¡Checklist listo para empacar!', '🎒');
+    }
+
+    function updateProgress() {
+      const packingItems = appData.renaico.filter(x => x.cat.startsWith('llevar_'));
+      const total = packingItems.length;
+      const packed = packingItems.filter(x => x.checked).length;
+      const percent = total > 0 ? Math.round((packed / total) * 100) : 0;
+
+      const pText = document.getElementById('progressText');
+      const pBar = document.getElementById('progressBar');
+      if (pText && pBar) {
+        pText.innerText = `${percent}% (${packed}/${total})`;
+        pBar.style.width = `${percent}%`;
+      }
+    }
+
+    function renderContent() {
+      const container = document.getElementById('mainContentArea');
+      const categories = currentTab === 'renaico' ? RENAICO_CATEGORIES : INSTITUTO_CATEGORIES;
+      const items = appData[currentTab];
+      
+      let html = '';
+
+      Object.keys(categories).forEach(catKey => {
+        const catInfo = categories[catKey];
+        let catItems = items.filter(x => x.cat === catKey);
+
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase();
+          catItems = catItems.filter(x => 
+            x.title.toLowerCase().includes(q) || 
+            (x.summary && x.summary.toLowerCase().includes(q)) ||
+            (x.detail && x.detail.toLowerCase().includes(q))
+          );
+        }
+
+        const totalInCat = catItems.length;
+        const checkedInCat = catItems.filter(x => x.checked).length;
+
+        html += `
+          <div class="bg-cardBase border border-borderSubtle rounded-2xl overflow-hidden shadow-sm">
+            <!-- Header Categoría -->
+            <div class="flex items-center justify-between p-3 bg-cardElevated/50 border-b border-borderSubtle/60">
+              <div class="flex items-center gap-2">
+                <span class="text-base">${catInfo.icon}</span>
+                <h2 class="text-xs font-bold text-textMain tracking-tight font-['Plus_Jakarta_Sans']">
+                  ${catInfo.name}
+                </h2>
+              </div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-cardBase border border-borderSubtle text-textMuted font-semibold">
+                ${checkedInCat}/${totalInCat}
+              </span>
+            </div>
+
+            <!-- Listado con Tarjetas Resumen + Detalle Desplegable -->
+            <div class="p-2 space-y-2">
+              ${catItems.length === 0 ? `
+                <p class="text-center py-3 text-xs text-textMuted italic">No hay tareas o elementos aquí</p>
+              ` : ''}
+
+              ${catItems.map(item => {
+                const isOpen = !!expandedCards[item.id];
+                return `
+                  <div class="rounded-xl border ${isOpen ? 'border-goldAccent/40 bg-cardElevated' : 'border-borderSubtle/60 bg-cardElevated/40'} transition-all duration-200 overflow-hidden">
+                    <!-- Fila Principal (Resumen Visible) -->
+                    <div 
+                      onclick="toggleCardDetail('${item.id}')"
+                      class="p-2.5 flex items-start justify-between gap-2.5 cursor-pointer hover:bg-cardElevated/80 active:bg-cardElevated transition select-none">
+                      
+                      <!-- Checkbox + Título + Resumen -->
+                      <div class="flex items-start gap-2.5 flex-1 min-w-0">
+                        <input 
+                          type="checkbox" 
+                          ${item.checked ? 'checked' : ''} 
+                          onclick="toggleCheck('${item.id}', event)"
+                          class="mt-1 w-4 h-4 rounded-md border-borderSubtle text-emeraldAccent focus:ring-0 focus:ring-offset-0 bg-cardBase accent-emerald-500 cursor-pointer shrink-0"
+                        >
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs text-textMain font-semibold leading-snug break-words ${item.checked ? 'strikethrough-title' : ''}">
+                            ${item.title}
+                          </p>
+                          
+                          <!-- Resumen Visual Destacado -->
+                          ${item.summary ? `
+                            <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-[#0e0d13]/70 border border-borderSubtle text-[11px] text-goldSoft font-medium">
+                              <span>📌</span>
+                              <span class="truncate">${item.summary}</span>
+                            </div>
+                          ` : ''}
+                        </div>
+                      </div>
+
+                      <!-- Flecha Desplegable -->
+                      <div class="flex items-center gap-1 shrink-0 pt-0.5">
+                        <span class="text-[11px] text-textMuted transition-transform duration-200 ${isOpen ? 'rotate-180 text-goldAccent' : ''}">
+                          ▼
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Detalle Expandido (Solo visible al tocar) -->
+                    ${isOpen ? `
+                      <div class="px-3 pb-3 pt-1 border-t border-borderSubtle/50 text-xs bg-[#0e0d13]/40 space-y-2">
+                        <div class="p-2.5 rounded-lg bg-cardBase border border-borderSubtle/80 text-[11.5px] leading-relaxed text-textMain whitespace-pre-line font-normal">
+                          <div class="text-[10px] uppercase font-bold text-goldAccent tracking-wider mb-1 flex items-center gap-1">
+                            <span>🔍</span> Detalle para no olvidar:
+                          </div>
+                          ${item.detail ? item.detail : 'Sin detalles adicionales registrados.'}
+                        </div>
+
+                        <!-- Acciones del Item -->
+                        <div class="flex justify-end items-center gap-3 pt-1 text-[11px]">
+                          <button 
+                            onclick="deleteItem('${item.id}', event)"
+                            class="text-rose-400 hover:text-rose-300 font-medium transition flex items-center gap-1">
+                            <span>🗑️</span> Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateProgress();
+    }
+
+    function openAddItemModal() {
+      const select = document.getElementById('newItemCategory');
+      const categories = currentTab === 'renaico' ? RENAICO_CATEGORIES : INSTITUTO_CATEGORIES;
+      document.getElementById('modalTitle').innerText = currentTab === 'renaico' ? 'Agregar a Renaico' : 'Agregar a Instituto';
+      
+      select.innerHTML = Object.keys(categories).map(k => `
+        <option value="${k}">${categories[k].icon} ${categories[k].name}</option>
+      `).join('');
+
+      document.getElementById('newItemTitle').value = '';
+      document.getElementById('newItemSummary').value = '';
+      document.getElementById('newItemDetail').value = '';
+      document.getElementById('modalAddItem').classList.remove('hidden');
+      document.getElementById('modalAddItem').classList.add('flex');
+      setTimeout(() => document.getElementById('newItemTitle').focus(), 120);
+    }
+
+    function closeAddItemModal() {
+      document.getElementById('modalAddItem').classList.add('hidden');
+      document.getElementById('modalAddItem').classList.remove('flex');
+    }
+
+    function saveNewItem() {
+      const title = document.getElementById('newItemTitle').value.trim();
+      const summary = document.getElementById('newItemSummary').value.trim();
+      const cat = document.getElementById('newItemCategory').value;
+      const detail = document.getElementById('newItemDetail').value.trim();
+
+      if (!title) {
+        showToast('Escribe un título para la tarea', '⚠️');
+        return;
+      }
+
+      const newItem = {
+        id: 'usr_' + Date.now().toString(36),
+        cat: cat,
+        title: title,
+        summary: summary,
+        detail: detail,
+        checked: false
+      };
+
+      appData[currentTab].unshift(newItem);
+      saveData();
+      closeAddItemModal();
+      // Auto-abrir la nueva tarea para ver su detalle
+      expandedCards[newItem.id] = true;
+      renderContent();
+      showToast('Guardado con detalle', '✅');
+    }
+
+    function toggleSearch() {
+      const container = document.getElementById('searchContainer');
+      container.classList.toggle('hidden');
+      if (!container.classList.contains('hidden')) {
+        document.getElementById('globalSearchInput').focus();
+      } else {
+        clearSearch();
+      }
+    }
+
+    function handleSearch(val) {
+      searchQuery = val;
+      renderContent();
+    }
+
+    function clearSearch() {
+      searchQuery = '';
+      document.getElementById('globalSearchInput').value = '';
+      renderContent();
+    }
+
+    function exportData() {
+      const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", jsonStr);
+      downloadAnchor.setAttribute("download", `estacion_respaldo_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Respaldo JSON descargado', '💾');
+    }
+
+    window.onload = function() {
+      renderContent();
+    };
+  </script>
+</body>
+</html>
