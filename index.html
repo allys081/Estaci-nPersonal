@@ -85,7 +85,7 @@
           <h1 class="text-base font-bold tracking-tight text-textMain leading-none font-['Plus_Jakarta_Sans']" id="headerTitle">
             Traslado a Renaico
           </h1>
-          <p class="text-[11px] text-textMuted mt-0.5" id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
+          
         </div>
       </div>
 
@@ -143,7 +143,7 @@
   <!-- Hint helper -->
   <div class="max-w-md mx-auto px-4 mt-2">
     <p class="text-[11px] text-textMuted/80 italic flex items-center gap-1">
-      <span>💡</span> <span>Toca cualquier tarea para <b>desplegar el detalle completo</b>.</span>
+      <span>💡</span> <span>Toca cualquier tarea para <b>abrir su detalle en pantalla grande</b>.</span>
     </p>
   </div>
 
@@ -234,6 +234,67 @@
       <div class="grid grid-cols-2 gap-2 mt-4">
         <button onclick="closeAddItemModal()" class="w-full py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
         <button onclick="saveNewItem()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purpleAccent to-goldAccent text-white font-bold text-xs shadow-lg shadow-purpleAccent/20">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nueva categoría -->
+  <div id="modalAddCat" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
+      <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] mb-3">Nueva categoría</h3>
+      <label class="block text-textMuted font-medium mb-1 text-xs">Nombre</label>
+      <input type="text" id="newCatName" placeholder="Ej: Ropa, Medicamentos, Ramos del semestre..."
+        class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent">
+      <label id="newCatPackingRow" class="hidden items-center gap-2 mt-3 text-xs text-textMuted">
+        <input type="checkbox" id="newCatPacking" class="w-4 h-4 accent-emerald-500">
+        Cuenta para la barra de equipaje empacado
+      </label>
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <button onclick="closeAddCatModal()" class="py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
+        <button onclick="saveNewCat()" class="py-2.5 rounded-xl bg-gradient-to-r from-purpleAccent to-goldAccent text-white font-bold text-xs">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar -->
+  <div id="modalConfirm" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
+      <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] mb-2" id="confirmTitle"></h3>
+      <p class="text-xs text-textMuted leading-relaxed" id="confirmText"></p>
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <button onclick="closeConfirm()" class="py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
+        <button onclick="runConfirm()" class="py-2.5 rounded-xl bg-rose-500/90 text-white font-bold text-xs">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de detalle en pantalla completa -->
+  <div id="detailView" class="fixed inset-0 z-[60] bg-bgCanvas hidden flex-col">
+    <div class="px-4 pt-4 pb-3 border-b border-borderSubtle flex items-center justify-between bg-[#0e0d13]/95 backdrop-blur-md">
+      <button onclick="closeDetail()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cardBase border border-borderSubtle text-sm font-semibold text-textMain active:scale-95 transition">
+        <span>←</span> Volver
+      </button>
+      <span id="detailCat" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-cardBase border border-borderSubtle text-goldSoft"></span>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-5 py-6">
+      <div class="max-w-xl mx-auto">
+        <h2 id="detailTitle" class="text-2xl font-extrabold leading-tight text-textMain font-['Plus_Jakarta_Sans'] break-words"></h2>
+        <div id="detailSummary" class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg bg-cardBase border border-borderSubtle text-sm text-goldSoft font-medium"></div>
+
+        <div class="mt-6 p-5 rounded-2xl bg-cardBase border border-goldAccent/30 gold-glow">
+          <div class="text-xs uppercase font-bold text-goldAccent tracking-wider mb-3 flex items-center gap-2">
+            <span>🔍</span> Detalle para no olvidar
+          </div>
+          <div id="detailBody" class="text-base leading-relaxed text-textMain whitespace-pre-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-4 py-3 border-t border-borderSubtle bg-[#0e0d13]/95 backdrop-blur-md" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+      <div class="max-w-xl mx-auto grid grid-cols-2 gap-3">
+        <button id="detailCheckBtn" onclick="toggleCheckFromDetail()" class="py-3 rounded-xl font-bold text-sm active:scale-95 transition"></button>
+        <button onclick="deleteFromDetail()" class="py-3 rounded-xl bg-cardElevated border border-rose-400/30 text-rose-400 font-bold text-sm active:scale-95 transition">🗑️ Eliminar</button>
       </div>
     </div>
   </div>
@@ -424,28 +485,32 @@
       ]
     };
 
-    // Categorías de Renaico
-    const RENAICO_CATEGORIES = {
-      llevar_tec: { name: '💻 Tecnológico & Cables', icon: '🔌' },
-      llevar_skin: { name: '🧴 Skincare & Aseo', icon: '✨' },
-      llevar_mat: { name: '📚 Material & Cuadernos', icon: '📝' },
-      ya_en_renaico: { name: '🏠 Ya está en Renaico (No empacar)', icon: '📦' },
-      pendientes_alla: { name: '📌 Pendientes mientras estoy allá', icon: '⏳' },
-      comprar_alla: { name: '🛒 Comprar allá y ubicar', icon: '🛍️' }
+    // Categorías (editables, se guardan en el teléfono)
+    const DEFAULT_CATS = {
+      renaico: [
+        { key: 'llevar_tec', name: 'Tecnológico & Cables', packing: true },
+        { key: 'llevar_skin', name: 'Skincare & Aseo', packing: true },
+        { key: 'llevar_mat', name: 'Material & Cuadernos', packing: true },
+        { key: 'ya_en_renaico', name: 'Ya está en Renaico (No empacar)', packing: false },
+        { key: 'pendientes_alla', name: 'Pendientes mientras estoy allá', packing: false },
+        { key: 'comprar_alla', name: 'Comprar allá y ubicar', packing: false }
+      ],
+      instituto: [
+        { key: 'estudio', name: 'Enfoque & Hábitos de Estudio', packing: false },
+        { key: 'evaluaciones', name: 'Evaluaciones & Bienestar', packing: false },
+        { key: 'estructura', name: 'Estructura & Organización', packing: false },
+        { key: 'toma_ramos', name: 'Toma de Ramos & Planificación', packing: false }
+      ]
     };
-
-    // Categorías de Instituto
-    const INSTITUTO_CATEGORIES = {
-      estudio: { name: '🧠 Enfoque & Hábitos de Estudio', icon: '📖' },
-      evaluaciones: { name: '🎯 Evaluaciones & Bienestar', icon: '🌙' },
-      estructura: { name: '📋 Estructura & Organización', icon: '🗂️' },
-      toma_ramos: { name: '🎓 Toma de Ramos & Planificación', icon: '⚖️' }
-    };
+    let catData = JSON.parse(localStorage.getItem('estacion_categorias') || 'null') || JSON.parse(JSON.stringify(DEFAULT_CATS));
+    function saveCats() { localStorage.setItem('estacion_categorias', JSON.stringify(catData)); }
+    function getCats() { return catData[currentTab]; }
+    function isPackingCat(key) { const c = catData.renaico.find(x => x.key === key); return !!(c && c.packing); }
 
     // Estado en memoria
     let currentTab = 'renaico';
     let searchQuery = '';
-    let expandedCards = {}; // Recordar qué tarjetas de detalle están abiertas
+    let openCats = {}; // categorías desplegadas (todas cerradas al inicio)
     let appData = JSON.parse(localStorage.getItem('estacion_detallada_data') || JSON.stringify(DEFAULT_DATA));
 
     function saveData() {
@@ -491,12 +556,136 @@
       renderContent();
     }
 
-    // Toggle para desplegar / contraer el detalle de una tarea específica
-    function toggleCardDetail(id) {
-      expandedCards[id] = !expandedCards[id];
+    function toggleCat(key) {
+      openCats[key] = !openCats[key];
       renderContent();
       if (navigator.vibrate) navigator.vibrate(8);
     }
+
+    // --- Crear / eliminar categorías ---
+    function openAddCatModal() {
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatPacking').checked = false;
+      const row = document.getElementById('newCatPackingRow');
+      row.classList.toggle('hidden', currentTab !== 'renaico');
+      row.classList.toggle('flex', currentTab === 'renaico');
+      const m = document.getElementById('modalAddCat');
+      m.classList.remove('hidden'); m.classList.add('flex');
+      setTimeout(() => document.getElementById('newCatName').focus(), 120);
+    }
+    function closeAddCatModal() {
+      const m = document.getElementById('modalAddCat');
+      m.classList.add('hidden'); m.classList.remove('flex');
+    }
+    function saveNewCat() {
+      const name = document.getElementById('newCatName').value.trim();
+      if (!name) { showToast('Escribe un nombre', '⚠️'); return; }
+      const cat = {
+        key: 'c_' + Date.now().toString(36),
+        name: name,
+        packing: currentTab === 'renaico' && document.getElementById('newCatPacking').checked
+      };
+      catData[currentTab].push(cat);
+      saveCats();
+      openCats[cat.key] = true;
+      closeAddCatModal();
+      renderContent();
+      showToast('Categoría creada', '✅');
+    }
+
+    let pendingConfirm = null;
+    function openConfirm(title, text, fn) {
+      document.getElementById('confirmTitle').innerText = title;
+      document.getElementById('confirmText').innerText = text;
+      pendingConfirm = fn;
+      const m = document.getElementById('modalConfirm');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function closeConfirm() {
+      const m = document.getElementById('modalConfirm');
+      m.classList.add('hidden'); m.classList.remove('flex');
+      pendingConfirm = null;
+    }
+    function runConfirm() { const fn = pendingConfirm; closeConfirm(); if (fn) fn(); }
+
+    function askDeleteCat(key) {
+      const cat = getCats().find(c => c.key === key);
+      if (!cat) return;
+      const n = appData[currentTab].filter(x => x.cat === key).length;
+      openConfirm(
+        'Eliminar "' + cat.name + '"',
+        n > 0 ? 'Se eliminarán también las ' + n + ' tarea(s) que contiene. No se puede deshacer.' : 'La categoría está vacía.',
+        () => deleteCat(key)
+      );
+    }
+    function deleteCat(key) {
+      catData[currentTab] = catData[currentTab].filter(c => c.key !== key);
+      appData[currentTab] = appData[currentTab].filter(x => x.cat !== key);
+      delete openCats[key];
+      saveCats();
+      saveData();
+      renderContent();
+      showToast('Categoría eliminada', '🗑️');
+    }
+
+    // --- Vista de detalle en pantalla grande ---
+    let openItemId = null;
+
+
+    function paintDetail() {
+      const item = appData[currentTab].find(x => x.id === openItemId);
+      if (!item) return closeDetail(true);
+      const cat = getCats().find(c => c.key === item.cat);
+      document.getElementById('detailCat').innerText = cat ? cat.name : '';
+      const t = document.getElementById('detailTitle');
+      t.innerText = item.title;
+      t.classList.toggle('strikethrough-title', !!item.checked);
+      const sum = document.getElementById('detailSummary');
+      sum.style.display = item.summary ? 'inline-flex' : 'none';
+      sum.innerText = item.summary ? '📌 ' + item.summary : '';
+      document.getElementById('detailBody').innerText = item.detail || 'Sin detalles adicionales registrados.';
+      const btn = document.getElementById('detailCheckBtn');
+      btn.innerText = item.checked ? '↩︎ Desmarcar' : '✓ Marcar como listo';
+      btn.className = 'py-3 rounded-xl font-bold text-sm active:scale-95 transition ' +
+        (item.checked ? 'bg-cardElevated border border-borderSubtle text-textMuted'
+                      : 'bg-gradient-to-r from-emerald-500 to-teal-400 text-[#0e0d13]');
+    }
+
+    function openDetail(id) {
+      openItemId = id;
+      paintDetail();
+      const v = document.getElementById('detailView');
+      v.classList.remove('hidden');
+      v.classList.add('flex');
+      v.querySelector('.overflow-y-auto').scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+      try { history.pushState({ detail: true }, ''); } catch (e) {}
+      if (navigator.vibrate) navigator.vibrate(8);
+    }
+
+    function closeDetail(skipHistory) {
+      const v = document.getElementById('detailView');
+      if (v.classList.contains('hidden')) return;
+      v.classList.add('hidden');
+      v.classList.remove('flex');
+      document.body.style.overflow = '';
+      openItemId = null;
+      if (skipHistory !== 'pop') { try { if (history.state && history.state.detail) history.back(); } catch (e) {} }
+    }
+
+    function toggleCheckFromDetail() {
+      toggleCheck(openItemId);
+      paintDetail();
+    }
+
+    function deleteFromDetail() {
+      const id = openItemId;
+      closeDetail();
+      deleteItem(id);
+    }
+
+    window.addEventListener('popstate', () => closeDetail('pop'));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 
     // Checkbox toggle
     function toggleCheck(id, e) {
@@ -521,7 +710,7 @@
 
     function resetPackingChecklist() {
       appData.renaico.forEach(item => {
-        if (item.cat.startsWith('llevar_')) {
+        if (isPackingCat(item.cat)) {
           item.checked = false;
         }
       });
@@ -531,7 +720,7 @@
     }
 
     function updateProgress() {
-      const packingItems = appData.renaico.filter(x => x.cat.startsWith('llevar_'));
+      const packingItems = appData.renaico.filter(x => isPackingCat(x.cat));
       const total = packingItems.length;
       const packed = packingItems.filter(x => x.checked).length;
       const percent = total > 0 ? Math.round((packed / total) * 100) : 0;
@@ -546,13 +735,12 @@
 
     function renderContent() {
       const container = document.getElementById('mainContentArea');
-      const categories = currentTab === 'renaico' ? RENAICO_CATEGORIES : INSTITUTO_CATEGORIES;
       const items = appData[currentTab];
       
       let html = '';
 
-      Object.keys(categories).forEach(catKey => {
-        const catInfo = categories[catKey];
+      getCats().forEach(catInfo => {
+        const catKey = catInfo.key;
         let catItems = items.filter(x => x.cat === catKey);
 
         if (searchQuery.trim() !== '') {
@@ -564,44 +752,43 @@
           );
         }
 
+        const catOpen = !!openCats[catKey] || searchQuery.trim() !== '';
         const totalInCat = catItems.length;
         const checkedInCat = catItems.filter(x => x.checked).length;
 
         html += `
           <div class="bg-cardBase border border-borderSubtle rounded-2xl overflow-hidden shadow-sm">
             <!-- Header Categoría -->
-            <div class="flex items-center justify-between p-3 bg-cardElevated/50 border-b border-borderSubtle/60">
+            <div onclick="toggleCat('${catKey}')" class="flex items-center justify-between p-3 bg-cardElevated/50 ${catOpen ? 'border-b border-borderSubtle/60' : ''} cursor-pointer select-none active:bg-cardElevated transition">
               <div class="flex items-center gap-2">
-                <span class="text-base">${catInfo.icon}</span>
                 <h2 class="text-xs font-bold text-textMain tracking-tight font-['Plus_Jakarta_Sans']">
                   ${catInfo.name}
                 </h2>
               </div>
+              <div class="flex items-center">
               <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-cardBase border border-borderSubtle text-textMuted font-semibold">
                 ${checkedInCat}/${totalInCat}
               </span>
+              <span class="text-[11px] text-textMuted transition-transform duration-200 ml-2 ${catOpen ? 'rotate-180 text-goldAccent' : ''}">▼</span>
+              </div>
             </div>
 
             <!-- Listado con Tarjetas Resumen + Detalle Desplegable -->
-            <div class="p-2 space-y-2">
+            ${catOpen ? `<div class="p-2 space-y-2">
               ${catItems.length === 0 ? `
                 <p class="text-center py-3 text-xs text-textMuted italic">No hay tareas o elementos aquí</p>
               ` : ''}
 
               ${catItems.map(item => {
-                const isOpen = !!expandedCards[item.id];
                 return `
-                  <div class="rounded-xl border ${isOpen ? 'border-goldAccent/40 bg-cardElevated' : 'border-borderSubtle/60 bg-cardElevated/40'} transition-all duration-200 overflow-hidden">
-                    <!-- Fila Principal (Resumen Visible) -->
-                    <div 
-                      onclick="toggleCardDetail('${item.id}')"
+                  <div class="rounded-xl border border-borderSubtle/60 bg-cardElevated/40 active:border-goldAccent/40 transition-all duration-200 overflow-hidden">
+                    <div
+                      onclick="openDetail('${item.id}')"
                       class="p-2.5 flex items-start justify-between gap-2.5 cursor-pointer hover:bg-cardElevated/80 active:bg-cardElevated transition select-none">
-                      
-                      <!-- Checkbox + Título + Resumen -->
                       <div class="flex items-start gap-2.5 flex-1 min-w-0">
-                        <input 
-                          type="checkbox" 
-                          ${item.checked ? 'checked' : ''} 
+                        <input
+                          type="checkbox"
+                          ${item.checked ? 'checked' : ''}
                           onclick="toggleCheck('${item.id}', event)"
                           class="mt-1 w-4 h-4 rounded-md border-borderSubtle text-emeraldAccent focus:ring-0 focus:ring-offset-0 bg-cardBase accent-emerald-500 cursor-pointer shrink-0"
                         >
@@ -609,8 +796,6 @@
                           <p class="text-xs text-textMain font-semibold leading-snug break-words ${item.checked ? 'strikethrough-title' : ''}">
                             ${item.title}
                           </p>
-                          
-                          <!-- Resumen Visual Destacado -->
                           ${item.summary ? `
                             <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-[#0e0d13]/70 border border-borderSubtle text-[11px] text-goldSoft font-medium">
                               <span>📌</span>
@@ -619,55 +804,34 @@
                           ` : ''}
                         </div>
                       </div>
-
-                      <!-- Flecha Desplegable -->
-                      <div class="flex items-center gap-1 shrink-0 pt-0.5">
-                        <span class="text-[11px] text-textMuted transition-transform duration-200 ${isOpen ? 'rotate-180 text-goldAccent' : ''}">
-                          ▼
-                        </span>
+                      <div class="flex items-center shrink-0 pt-0.5">
+                        <span class="text-base text-textMuted">›</span>
                       </div>
                     </div>
-
-                    <!-- Detalle Expandido (Solo visible al tocar) -->
-                    ${isOpen ? `
-                      <div class="px-3 pb-3 pt-1 border-t border-borderSubtle/50 text-xs bg-[#0e0d13]/40 space-y-2">
-                        <div class="p-2.5 rounded-lg bg-cardBase border border-borderSubtle/80 text-[11.5px] leading-relaxed text-textMain whitespace-pre-line font-normal">
-                          <div class="text-[10px] uppercase font-bold text-goldAccent tracking-wider mb-1 flex items-center gap-1">
-                            <span>🔍</span> Detalle para no olvidar:
-                          </div>
-                          ${item.detail ? item.detail : 'Sin detalles adicionales registrados.'}
-                        </div>
-
-                        <!-- Acciones del Item -->
-                        <div class="flex justify-end items-center gap-3 pt-1 text-[11px]">
-                          <button 
-                            onclick="deleteItem('${item.id}', event)"
-                            class="text-rose-400 hover:text-rose-300 font-medium transition flex items-center gap-1">
-                            <span>🗑️</span> Eliminar
-                          </button>
-                        </div>
-                      </div>
-                    ` : ''}
                   </div>
                 `;
               }).join('')}
-            </div>
+              <div class="flex justify-end pt-1">
+                <button onclick="askDeleteCat('${catKey}')" class="text-[11px] text-rose-400 hover:text-rose-300 font-medium px-2 py-1">Eliminar categoría</button>
+              </div>
+            </div>` : ''}
           </div>
         `;
       });
 
+      html += `
+        <button onclick="openAddCatModal()" class="w-full py-3 rounded-2xl border border-dashed border-borderSubtle text-xs font-semibold text-textMuted hover:text-textMain hover:border-goldAccent/50 active:scale-95 transition">
+          + Nueva categoría
+        </button>`;
       container.innerHTML = html;
       updateProgress();
     }
 
     function openAddItemModal() {
       const select = document.getElementById('newItemCategory');
-      const categories = currentTab === 'renaico' ? RENAICO_CATEGORIES : INSTITUTO_CATEGORIES;
+      if (getCats().length === 0) { showToast('Primero crea una categoría', '⚠️'); return; }
       document.getElementById('modalTitle').innerText = currentTab === 'renaico' ? 'Agregar a Renaico' : 'Agregar a Instituto';
-      
-      select.innerHTML = Object.keys(categories).map(k => `
-        <option value="${k}">${categories[k].icon} ${categories[k].name}</option>
-      `).join('');
+      select.innerHTML = getCats().map(c => `<option value="${c.key}">${c.name}</option>`).join('');
 
       document.getElementById('newItemTitle').value = '';
       document.getElementById('newItemSummary').value = '';
@@ -705,8 +869,6 @@
       appData[currentTab].unshift(newItem);
       saveData();
       closeAddItemModal();
-      // Auto-abrir la nueva tarea para ver su detalle
-      expandedCards[newItem.id] = true;
       renderContent();
       showToast('Guardado con detalle', '✅');
     }
@@ -733,7 +895,7 @@
     }
 
     function exportData() {
-      const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ ...appData, categorias: catData }, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", jsonStr);
       downloadAnchor.setAttribute("download", `estacion_respaldo_${new Date().toISOString().slice(0,10)}.json`);
