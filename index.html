@@ -1,564 +1,892 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Mi Estación · Renaico & Instituto</title>
-  
-  <!-- Íconos para la pantalla de inicio (PWA / Mobile Bookmark) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231f1c2b'/%3E%3Cstop offset='1' stop-color='%230e0d13'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)' stroke='%23d4af37' stroke-width='2'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23171520'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
-  <meta name="theme-color" content="#0e0d13">
 
-  <!-- Google Fonts (Incluye las 5 fuentes del selector) -->
+  <!-- Prevención de parpadeo de tema y fuente -->
+  <script>
+    try {
+      var t = localStorage.getItem('estacion_tema') || 'dark';
+      var d = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      var f = localStorage.getItem('estacion_fuente_titulos') || 'fraunces';
+      var F = {
+        fraunces: "'Fraunces', Georgia, serif",
+        jakarta: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fira: "'Fira Sans', system-ui, sans-serif",
+        chivo: "'Chivo', system-ui, sans-serif",
+        space: "'Space Grotesk', system-ui, sans-serif"
+      };
+      if (F[f]) document.documentElement.style.setProperty('--font-title', F[f]);
+    } catch (e) {}
+  </script>
+
+  <!-- Íconos de pantalla de inicio móvil (Evita el recuadro gris de Chrome) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cd6'/%3E%3Cstop offset='1' stop-color='%23d4af37'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cd6'/%3E%3Cstop offset='1' stop-color='%23d4af37'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0e0d13" id="metaThemeColor">
+
+  <!-- Tipografías de Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@600;700;800&family=Fira+Sans:wght@500;600;700&family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            bgCanvas: '#0e0d13',
-            cardBase: '#171520',
-            cardElevated: '#1f1c2b',
-            borderSubtle: '#2c273d',
-            goldAccent: '#d4af37',
-            goldSoft: '#f5deb3',
-            roseAccent: '#e08ca3',
-            purpleAccent: '#9d7cd8',
-            emeraldAccent: '#10b981',
-            textMain: '#f3eef8',
-            textMuted: '#948a9f'
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            customTitle: ['var(--font-title)', 'serif']
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
+    /* ─── Variables de Color y Diseño ─── */
     :root {
       --font-title: 'Fraunces', Georgia, serif;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      
+      /* Modo Claro (Paleta Cálida Marfil / Crema) */
+      --bg: #fbf5ee;
+      --card: #fffdf9;
+      --card-elevated: #f4ecdf;
+      --border: #eadfd2;
+      --text: #3b2a22;
+      --muted: #7a685d;
+      --p: #7c5cd6;
+      --p-soft: #ece6fb;
+      --gold: #b38600;
+      --gold-soft: #fff6d9;
+      --emerald: #059669;
+      --emerald-soft: #d1fae5;
+      --rose: #be185d;
+      --rose-soft: #fce7f3;
+      --shadow: 0 1px 3px rgba(80,50,30,.06), 0 8px 22px rgba(80,50,30,.08);
+      --scrim: rgba(40, 25, 15, 0.55);
     }
 
+    [data-theme="dark"] {
+      /* Modo Oscuro (Luxury Dark) */
+      --bg: #0e0d13;
+      --card: #171520;
+      --card-elevated: #1f1c2b;
+      --border: #2c273d;
+      --text: #f3eef8;
+      --muted: #948a9f;
+      --p: #9d7cd8;
+      --p-soft: #2b2445;
+      --gold: #d4af37;
+      --gold-soft: #f5deb3;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --rose: #e08ca3;
+      --rose-soft: rgba(224, 140, 163, 0.16);
+      --shadow: 0 1px 3px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.45);
+      --scrim: rgba(0, 0, 0, 0.75);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
-      background-color: #0e0d13;
-      color: #f3eef8;
-      font-family: 'Inter', system-ui, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    
-    .font-title {
-      font-family: var(--font-title) !important;
-    }
-    
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0e0d13;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2c273d;
-      border-radius: 99px;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 14px 14px 110px;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    .strikethrough-title {
+    .font-title {
+      font-family: var(--font-title), Georgia, serif !important;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ─── Cabecera Principal ─── */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 2px 14px;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .top-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .top-titles h1 {
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+    .top-titles p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+    .icon-btn:active { transform: scale(0.93); }
+    .icon-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--card-elevated);
+    }
+
+    /* Menú desplegable 'Aa' Fuentes */
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 48px;
+      width: 220px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      z-index: 60;
+      display: none;
+    }
+    .dropdown-menu.open { display: block; }
+    .dropdown-header {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      padding: 6px 12px 4px;
+    }
+    .font-btn {
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .font-btn:hover { background: var(--card-elevated); }
+    .font-btn.active {
+      background: var(--p-soft);
+      color: var(--p);
+    }
+
+    /* ─── Barra de Búsqueda ─── */
+    .search-wrap {
+      margin-bottom: 12px;
+      position: sticky;
+      top: 8px;
+      z-index: 25;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 15px;
+      padding: 9px 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-box:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+    }
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: inherit;
+    }
+    .search-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      display: none;
+    }
+    .search-box.has-val .search-clear { display: block; }
+
+    /* ─── Barra de Progreso de Empaque (Renaico) ─── */
+    .packing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .packing-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .packing-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: var(--card-elevated);
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .packing-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #10b981, #059669);
+      transition: width 0.3s ease;
+    }
+    .packing-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.72rem;
+    }
+    .packing-reset {
+      border: none;
+      background: none;
+      color: var(--emerald);
+      font-weight: 700;
+      font-size: 0.74rem;
+      cursor: pointer;
+    }
+
+    /* ─── Acordeón de Categorías ─── */
+    .cat-accordion {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s ease;
+    }
+    .cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--card);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s;
+    }
+    .cat-header:hover { background: var(--card-elevated); }
+    .cat-title-text {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-counter {
+      font-size: 0.72rem;
+      font-family: monospace;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--card-elevated);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .cat-arrow {
+      font-size: 0.72rem;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+    .cat-accordion.open .cat-arrow {
+      transform: rotate(180deg);
+      color: var(--gold);
+    }
+    .cat-content {
+      display: none;
+      padding: 4px 10px 10px;
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+    .cat-accordion.open .cat-content {
+      display: block;
+    }
+
+    /* ─── Filas de Tareas / Elementos (Minimalistas) ─── */
+    .task-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 6px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.12s;
+    }
+    .task-row:hover { background: var(--card-elevated); }
+    .task-row:last-child { border-bottom: none; }
+
+    .task-checkbox {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      color: transparent;
+      font-size: 0.75rem;
+      font-weight: 800;
+      transition: all 0.15s ease;
+    }
+    .task-checkbox.checked {
+      background: var(--emerald-soft);
+      border-color: var(--emerald);
+      color: var(--emerald);
+    }
+
+    .task-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .task-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .task-title.done {
       text-decoration: line-through;
       opacity: 0.55;
     }
-
-    .gold-glow {
-      box-shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.22);
+    .task-summary-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--gold-soft);
+      color: var(--gold);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      font-weight: 600;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    [data-theme="dark"] .task-summary-pill {
+      background: rgba(212, 175, 55, 0.1);
     }
 
-    .purple-glow {
-      box-shadow: 0 4px 20px -2px rgba(157, 124, 216, 0.25);
+    .task-arrow {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-top: 1px;
+      flex-shrink: 0;
     }
+
+    /* ─── Botón Flotante y Barra Inferior ─── */
+    .fab {
+      position: fixed;
+      z-index: 30;
+      right: max(16px, calc(50% - 240px));
+      bottom: calc(76px + env(safe-area-inset-bottom));
+      height: 50px;
+      padding: 0 18px;
+      border-radius: 16px;
+      background: var(--p);
+      color: #fff;
+      border: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.14s ease;
+    }
+    .fab:active { transform: scale(0.95); }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    .bottom-nav-inner {
+      max-width: 520px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .nav-tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .nav-tab-btn.active {
+      background: var(--p-soft);
+      border-color: var(--p);
+      color: var(--p);
+    }
+
+    /* ─── Modales Emergentes Centrados ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--scrim);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      transform: scale(0.94);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .modal-field {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+    .modal-field label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .modal-field p {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.45;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+
+    /* Formularios */
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 0.74rem; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    .form-input, .form-select, .form-area {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .form-area { min-height: 84px; resize: vertical; line-height: 1.4; }
+    .form-input:focus, .form-select:focus, .form-area:focus {
+      border-color: var(--gold);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 9px 16px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: transform 0.12s;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--p); color: #fff; }
+    .btn-secondary { background: var(--bg); border: 1.5px solid var(--border); color: var(--text); }
+    .btn-danger { color: var(--rose); border: 1px solid var(--border); background: var(--bg); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 20px;
+      transform: translate(-50%, -20px);
+      opacity: 0;
+      pointer-events: none;
+      background: var(--text);
+      color: var(--bg);
+      padding: 9px 16px;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      z-index: 200;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
   </style>
 </head>
-<body class="min-h-screen pb-32 select-none antialiased">
-
-  <!-- Mobile Top Bar with Navigation, Font Selector and Backup -->
-  <header class="sticky top-0 z-40 bg-[#0e0d13]/92 backdrop-blur-md border-b border-borderSubtle px-4 pt-3 pb-3">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-2.5">
-        <span class="text-2xl" id="headerIcon">🏡</span>
-        <div>
-          <h1 class="text-base font-bold tracking-tight text-textMain leading-none font-title" id="headerTitle">
-            Traslado a Renaico
-          </h1>
-          <p class="text-[11px] text-textMuted mt-0.5" id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
+<body>
+  <div class="container">
+    <!-- Barra Superior -->
+    <header class="top-bar">
+      <div class="top-left">
+        <span class="top-icon" id="headerIcon">🏡</span>
+        <div class="top-titles">
+          <h1 class="font-title" id="headerTitle">Traslado a Renaico</h1>
+          <p id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
         </div>
       </div>
 
-      <!-- Quick Action Controls -->
-      <div class="flex items-center space-x-1.5 relative">
-        <!-- Botón Selector Tipográfico 'Aa' -->
-        <button id="btnFontMenu" onclick="toggleFontMenu(event)" title="Cambiar tipo de letra" class="px-2.5 py-1.5 rounded-xl bg-cardBase border border-borderSubtle text-textMain hover:border-goldAccent active:scale-95 transition-all text-xs font-bold tracking-wide flex items-center">
-          Aa
-        </button>
+      <div class="top-actions">
+        <!-- Toggle Modo Claro / Oscuro -->
+        <button class="icon-btn" id="btnThemeToggle" title="Cambiar tema (Claro/Oscuro)">☀️</button>
+        <!-- Selector Tipográfico 'Aa' -->
+        <button class="icon-btn" id="btnFontToggle" title="Letra de los títulos">Aa</button>
+        <!-- Menú de Respaldos -->
+        <button class="icon-btn" id="btnExport" title="Respaldar JSON">💾</button>
+        <button class="icon-btn" id="btnImport" title="Cargar JSON">📂</button>
+        <input type="file" id="fileInput" style="display:none" accept=".json">
 
-        <button onclick="exportData()" title="Respaldar JSON" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-goldAccent active:scale-95 transition-all text-xs flex items-center gap-1">
-          💾
-        </button>
-        <button onclick="toggleSearch()" title="Buscar" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-textMain active:scale-95 transition-all text-xs">
-          🔍
-        </button>
-
-        <!-- Menú emergente de fuentes -->
-        <div id="fontDropdown" class="hidden absolute right-0 top-11 w-56 bg-cardBase/98 backdrop-blur-xl border border-borderSubtle rounded-2xl shadow-2xl p-2 z-50">
-          <div class="text-[10px] uppercase tracking-wider font-extrabold text-textMuted px-3 py-1.5">
-            Letra de los títulos
-          </div>
-          <div class="flex flex-col gap-1 mt-1" id="fontOptions">
-            <button onclick="changeTitleFont('fraunces')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Fraunces', serif;">
-              <span>Fraunces (la de ahora)</span>
-              <span class="check-mark hidden text-purpleAccent">✓</span>
-            </button>
-            <button onclick="changeTitleFont('jakarta')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-              <span>Plus Jakarta (sin serif)</span>
-              <span class="check-mark hidden text-purpleAccent">✓</span>
-            </button>
-            <button onclick="changeTitleFont('fira')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Fira Sans', sans-serif;">
-              <span>Fira Sans</span>
-              <span class="check-mark hidden text-purpleAccent">✓</span>
-            </button>
-            <button onclick="changeTitleFont('chivo')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Chivo', sans-serif;">
-              <span>Chivo</span>
-              <span class="check-mark hidden text-purpleAccent">✓</span>
-            </button>
-            <button onclick="changeTitleFont('space')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Space Grotesk', sans-serif;">
-              <span>Space Grotesk</span>
-              <span class="check-mark hidden text-purpleAccent">✓</span>
-            </button>
-          </div>
+        <!-- Menú flotante de fuentes -->
+        <div class="dropdown-menu" id="fontDropdown">
+          <div class="dropdown-header">Letra de los títulos</div>
+          <button class="font-btn" onclick="setFont('fraunces')" style="font-family:'Fraunces', serif;">
+            <span>Fraunces (serif)</span><span class="check" id="chk-fraunces">✓</span>
+          </button>
+          <button class="font-btn" onclick="setFont('jakarta')" style="font-family:'Plus Jakarta Sans', sans-serif;">
+            <span>Plus Jakarta</span><span class="check" id="chk-jakarta"></span>
+          </button>
+          <button class="font-btn" onclick="setFont('fira')" style="font-family:'Fira Sans', sans-serif;">
+            <span>Fira Sans</span><span class="check" id="chk-fira"></span>
+          </button>
+          <button class="font-btn" onclick="setFont('chivo')" style="font-family:'Chivo', sans-serif;">
+            <span>Chivo</span><span class="check" id="chk-chivo"></span>
+          </button>
+          <button class="font-btn" onclick="setFont('space')" style="font-family:'Space Grotesk', sans-serif;">
+            <span>Space Grotesk</span><span class="check" id="chk-space"></span>
+          </button>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Collapsible Search Input -->
-    <div id="searchContainer" class="max-w-md mx-auto hidden mt-2.5">
-      <div class="relative">
-        <input 
-          type="text" 
-          id="globalSearchInput" 
-          placeholder="Buscar tareas, tips, apuntes o equipaje..." 
-          oninput="handleSearch(this.value)"
-          class="w-full bg-cardBase border border-borderSubtle rounded-xl py-2 px-3 pl-8 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent transition"
-        >
-        <span class="absolute left-2.5 top-2.5 text-xs text-textMuted">🔎</span>
-        <button onclick="clearSearch()" class="absolute right-2.5 top-2 text-xs text-textMuted hover:text-textMain">✕</button>
+    <!-- Barra de Búsqueda -->
+    <div class="search-wrap">
+      <div class="search-box" id="searchBoxContainer">
+        <span>🔎</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar tarea, apunte, cable o tip..." autocomplete="off">
+        <button class="search-clear" id="btnSearchClear">✕</button>
       </div>
     </div>
-  </header>
 
-  <!-- Progress Bar (Only visible in Checklist mode / Renaico) -->
-  <section id="progressSection" class="max-w-md mx-auto px-4 mt-3">
-    <div class="bg-cardBase border border-borderSubtle rounded-2xl p-3.5 shadow-sm">
-      <div class="flex justify-between items-center mb-1.5 text-xs font-semibold">
-        <span class="text-textMuted flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+    <!-- Barra de Progreso de Empaque (Modo Renaico) -->
+    <section class="packing-card" id="packingCard">
+      <div class="packing-head">
+        <span style="color:var(--muted);display:flex;align-items:center;gap:6px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);"></span>
           Equipaje empacado
         </span>
-        <span id="progressText" class="text-emeraldAccent font-mono font-bold">0% (0/0)</span>
+        <span id="packingPercent" style="color:var(--emerald);font-family:monospace;font-weight:800;">0% (0/0)</span>
       </div>
-      <div class="w-full bg-cardElevated rounded-full h-2 overflow-hidden border border-borderSubtle/60">
-        <div id="progressBar" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      <div class="packing-bar-bg">
+        <div class="packing-bar-fill" id="packingBarFill" style="width: 0%;"></div>
       </div>
+      <div class="packing-footer">
+        <span style="color:var(--muted)">¿Preparando nuevo viaje?</span>
+        <button class="packing-reset" id="btnResetPacking">🔄 Desmarcar todo para viajar</button>
+      </div>
+    </section>
 
-      <!-- Quick Reset Button for Traveling -->
-      <div class="flex justify-between items-center mt-2.5 pt-2 border-t border-borderSubtle/60 text-[11px]">
-        <span class="text-textMuted">¿Nuevo viaje a Renaico?</span>
-        <button onclick="resetPackingChecklist()" class="text-emerald-400 font-semibold hover:underline active:scale-95 transition flex items-center gap-1">
-          🔄 Desmarcar todo para viajar
-        </button>
-      </div>
+    <!-- Herramientas de conteo -->
+    <div class="tools" id="toolsBar">
+      <span class="tot">Total en esta vista: <b id="totalItemsCount">0</b></span>
+      <span style="font-size:0.72rem;color:var(--muted);">💡 Toca una fila para ver el detalle en el centro</span>
     </div>
-  </section>
 
-  <!-- Hint helper -->
-  <div class="max-w-md mx-auto px-4 mt-2">
-    <p class="text-[11px] text-textMuted/80 italic flex items-center gap-1">
-      <span>💡</span> <span>Toca cualquier tarea para <b>abrir su detalle en pantalla grande</b>.</span>
-    </p>
-  </div>
+    <!-- Contenedor dinámico de Categorías y Tareas -->
+    <main id="mainContentArea"></main>
 
-  <!-- Main Dynamic View Container -->
-  <main class="max-w-md mx-auto px-4 mt-2.5 space-y-3" id="mainContentArea">
-    <!-- Loaded dynamically based on active tab -->
-  </main>
-
-  <!-- Floating Add Button -->
-  <div class="fixed bottom-20 right-4 z-30 max-w-md mx-auto">
-    <button onclick="openAddItemModal()" class="w-13 h-13 p-3.5 rounded-2xl bg-gradient-to-br from-purpleAccent to-roseAccent text-white shadow-xl shadow-purpleAccent/25 border border-white/20 active:scale-90 transition-all flex items-center justify-center font-bold text-lg">
-      ➕
-    </button>
-  </div>
-
-  <!-- Bottom App Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-[#0e0d13]/95 backdrop-blur-lg border-t border-borderSubtle px-6 py-2.5">
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-3">
-      <!-- Tab 1: Renaico -->
-      <button 
-        id="tabBtnRenaico" 
-        onclick="switchTab('renaico')" 
-        class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 gold-glow bg-emeraldAccent/10 border border-emeraldAccent/40 text-emerald-400">
-        <span class="text-xl">🏡</span>
-        <span class="text-xs font-semibold mt-0.5 tracking-tight font-title">Renaico</span>
+    <!-- Botón para añadir nueva categoría -->
+    <div style="margin-top: 14px;">
+      <button class="btn btn-secondary" style="width:100%;border-style:dashed;padding:10px;" id="btnAddCategory">
+        ＋ Nueva categoría
       </button>
+    </div>
+  </div>
 
-      <!-- Tab 2: Instituto -->
-      <button 
-        id="tabBtnInstituto" 
-        onclick="switchTab('instituto')" 
-        class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent">
-        <span class="text-xl">🎓</span>
-        <span class="text-xs font-semibold mt-0.5 tracking-tight font-title">Instituto</span>
+  <!-- Botón flotante ＋ Agregar Tarea -->
+  <button class="fab" id="btnFabAdd">
+    <span style="font-size:1.15rem;line-height:1">＋</span> Agregar
+  </button>
+
+  <!-- Barra de Navegación Inferior -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <button class="nav-tab-btn active" id="tabRenaico" onclick="switchSection('renaico')">
+        <span>🏡</span>
+        <span class="font-title">Renaico</span>
+      </button>
+      <button class="nav-tab-btn" id="tabInstituto" onclick="switchSection('instituto')">
+        <span>🎓</span>
+        <span class="font-title">Instituto</span>
       </button>
     </div>
   </nav>
 
-  <!-- Modal: Agregar Tarea con Resumen & Detalle Desplegable -->
-  <div id="modalAddItem" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl transition-all">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-base text-textMain font-title flex items-center gap-2">
-          <span>✨</span> <span id="modalTitle">Nueva Tarea / Item</span>
-        </h3>
-        <button onclick="closeAddItemModal()" class="w-8 h-8 rounded-full bg-cardElevated flex items-center justify-center text-textMuted hover:text-textMain">✕</button>
-      </div>
-
-      <div class="space-y-3 text-xs">
+  <!-- ═══════════════════════════════════════════════════
+       VENTANA EMERGENTE EN EL MEDIO (DETALLE COMPLETO)
+       ═══════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalDetail">
+    <div class="modal-card">
+      <div class="modal-head">
         <div>
-          <label class="block text-textMuted font-medium mb-1">Título principal</label>
-          <input 
-            type="text" 
-            id="newItemTitle" 
-            placeholder="Ej: Computador y periféricos, Repaso 3 días antes..." 
-            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent"
-          >
+          <span style="font-size:0.72rem;font-weight:700;color:var(--p);text-transform:uppercase;" id="detCatBadge">Categoría</span>
+          <h3 class="font-title" style="font-size:1.18rem;margin-top:2px;" id="detTitle">Título de la Tarea</h3>
         </div>
-
-        <div>
-          <label class="block text-textMuted font-medium mb-1">Resumen corto (visible siempre)</label>
-          <input 
-            type="text" 
-            id="newItemSummary" 
-            placeholder="Ej: Cargador + mouse + dongle, 45m estudio / 15m descanso..." 
-            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent"
-          >
-        </div>
-
-        <div>
-          <label class="block text-textMuted font-medium mb-1">Categoría</label>
-          <select id="newItemCategory" class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2 text-xs text-textMain focus:outline-none focus:border-goldAccent">
-            <!-- Populated dynamically -->
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-textMuted font-medium mb-1">Detalle completo (al tocar la tarea)</label>
-          <textarea 
-            id="newItemDetail" 
-            rows="3"
-            placeholder="Escribe todo lo que no debes olvidar: pasos, precauciones, dónde está guardado, notas importantes..." 
-            class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent resize-none"
-          ></textarea>
-        </div>
+        <button class="modal-close-btn" data-close>✕</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 mt-4">
-        <button onclick="closeAddItemModal()" class="w-full py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
-        <button onclick="saveNewItem()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purpleAccent to-goldAccent text-white font-bold text-xs shadow-lg shadow-purpleAccent/20">Guardar</button>
+      <div class="modal-field" id="detSummaryBox">
+        <label>Resumen visible</label>
+        <p id="detSummaryTxt"></p>
+      </div>
+
+      <div class="modal-field">
+        <label>Detalle para no olvidar</label>
+        <p id="detBodyTxt"></p>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn btn-primary" style="flex:1;" id="detToggleCheck">✓ Marcar como lista</button>
+        <button class="btn btn-danger" id="detDelete">🗑️</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Nueva categoría -->
-  <div id="modalAddCat" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
-      <h3 class="font-bold text-base text-textMain font-title mb-3">Nueva categoría</h3>
-      <label class="block text-textMuted font-medium mb-1 text-xs">Nombre</label>
-      <input type="text" id="newCatName" placeholder="Ej: Ropa, Medicamentos, Ramos del semestre..."
-        class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent">
-      <label id="newCatPackingRow" class="hidden items-center gap-2 mt-3 text-xs text-textMuted">
-        <input type="checkbox" id="newCatPacking" class="w-4 h-4 accent-emerald-500">
-        Cuenta para la barra de equipaje empacado
-      </label>
-      <div class="grid grid-cols-2 gap-2 mt-4">
-        <button onclick="closeAddCatModal()" class="py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
-        <button onclick="saveNewCat()" class="py-2.5 rounded-xl bg-gradient-to-r from-purpleAccent to-goldAccent text-white font-bold text-xs">Crear</button>
+  <!-- Modal: Agregar / Editar Tarea -->
+  <div class="modal-overlay" id="modalForm">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.18rem;" id="formModalTitle">Nueva Tarea</h3>
+        <button class="modal-close-btn" data-close>✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Título principal *</label>
+        <input type="text" id="inpTitle" class="form-input" placeholder="Ej: Computador y cargador...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Resumen corto (visible en la lista)</label>
+        <input type="text" id="inpSummary" class="form-input" placeholder="Ej: Cargador original, mouse y soporte...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select id="inpCategory" class="form-select"></select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Detalle completo (aparece al tocar en el centro)</label>
+        <textarea id="inpDetail" class="form-area" placeholder="Escribe los pasos, notas clave, precauciones o ubicaciones..."></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+        <button class="btn btn-secondary" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveTask">Guardar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Confirmar -->
-  <div id="modalConfirm" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
-      <h3 class="font-bold text-base text-textMain font-title mb-2" id="confirmTitle"></h3>
-      <p class="text-xs text-textMuted leading-relaxed" id="confirmText"></p>
-      <div class="grid grid-cols-2 gap-2 mt-4">
-        <button onclick="closeConfirm()" class="py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
-        <button onclick="runConfirm()" class="py-2.5 rounded-xl bg-rose-500/90 text-white font-bold text-xs">Eliminar</button>
+  <!-- Modal: Crear Categoría -->
+  <div class="modal-overlay" id="modalCategory">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.18rem;">Nueva Categoría</h3>
+        <button class="modal-close-btn" data-close>✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre de la categoría *</label>
+        <input type="text" id="inpCatName" class="form-input" placeholder="Ej: Ropa, Medicamentos, Certámenes...">
+      </div>
+
+      <div class="form-group" id="groupPackingCheckbox" style="display:none;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.8rem;color:var(--text)">
+          <input type="checkbox" id="inpCatPacking" style="width:16px;height:16px;accent-color:var(--emerald);">
+          <span>Cuenta para la barra de equipaje empacado</span>
+        </label>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+        <button class="btn btn-secondary" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveCategory">Crear</button>
       </div>
     </div>
   </div>
 
-  <!-- Vista de detalle en pantalla completa -->
-  <div id="detailView" class="fixed inset-0 z-[60] bg-bgCanvas hidden flex-col">
-    <div class="px-4 pt-4 pb-3 border-b border-borderSubtle flex items-center justify-between bg-[#0e0d13]/95 backdrop-blur-md">
-      <button onclick="closeDetail()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cardBase border border-borderSubtle text-sm font-semibold text-textMain active:scale-95 transition">
-        <span>←</span> Volver
-      </button>
-      <span id="detailCat" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-cardBase border border-borderSubtle text-goldSoft"></span>
-    </div>
-
-    <div class="flex-1 overflow-y-auto px-5 py-6">
-      <div class="max-w-xl mx-auto">
-        <h2 id="detailTitle" class="text-2xl font-extrabold leading-tight text-textMain font-title break-words"></h2>
-        <div id="detailSummary" class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg bg-cardBase border border-borderSubtle text-sm text-goldSoft font-medium"></div>
-
-        <div class="mt-6 p-5 rounded-2xl bg-cardBase border border-goldAccent/30 gold-glow">
-          <div class="text-xs uppercase font-bold text-goldAccent tracking-wider mb-3 flex items-center gap-2">
-            <span>🔍</span> Detalle para no olvidar
-          </div>
-          <div id="detailBody" class="text-base leading-relaxed text-textMain whitespace-pre-line"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="px-4 py-3 border-t border-borderSubtle bg-[#0e0d13]/95 backdrop-blur-md" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
-      <div class="max-w-xl mx-auto grid grid-cols-2 gap-3">
-        <button id="detailCheckBtn" onclick="toggleCheckFromDetail()" class="py-3 rounded-xl font-bold text-sm active:scale-95 transition"></button>
-        <button onclick="deleteFromDetail()" class="py-3 rounded-xl bg-cardElevated border border-rose-400/30 text-rose-400 font-bold text-sm active:scale-95 transition">🗑️ Eliminar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toastMessage" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-cardElevated border border-borderSubtle text-textMain px-4 py-2 rounded-2xl shadow-xl text-xs font-medium opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
-    <span id="toastIcon">✨</span>
-    <span id="toastText">Acción realizada</span>
-  </div>
+  <div class="toast" id="toastMsg">Acción guardada</div>
 
   <script>
-    // --- GESTIÓN DE FUENTES TIPOGRÁFICAS ---
-    const FONT_FAMILIES = {
-      fraunces: "'Fraunces', Georgia, serif",
-      jakarta: "'Plus Jakarta Sans', system-ui, sans-serif",
-      fira: "'Fira Sans', system-ui, sans-serif",
-      chivo: "'Chivo', system-ui, sans-serif",
-      space: "'Space Grotesk', system-ui, sans-serif"
-    };
+    /* ─── DATOS INICIALES Y CONSTANTES ─── */
+    const KEY_DATA = 'estacion_detallada_data';
+    const KEY_CATS = 'estacion_categorias';
+    const KEY_THEME = 'estacion_tema';
+    const KEY_FONT = 'estacion_fuente_titulos';
 
-    function applySavedFont() {
-      const savedKey = localStorage.getItem('estacion_fuente_titulos') || 'fraunces';
-      const fontVal = FONT_FAMILIES[savedKey] || FONT_FAMILIES.fraunces;
-      document.documentElement.style.setProperty('--font-title', fontVal);
+    const $ = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+    const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const vibrar = () => { if (navigator.vibrate) try { navigator.vibrate(8); } catch(e){} };
 
-      // Actualizar estilo visual activo en el menú
-      document.querySelectorAll('#fontOptions .font-opt').forEach(btn => {
-        btn.classList.remove('bg-cardElevated', 'text-purpleAccent');
-        btn.querySelector('.check-mark').classList.add('hidden');
-      });
-      const activeBtn = document.querySelector(`#fontOptions button[onclick*="${savedKey}"]`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-cardElevated', 'text-purpleAccent');
-        activeBtn.querySelector('.check-mark').classList.remove('hidden');
-      }
+    let toastTimer;
+    function toast(text) {
+      const el = $('#toastMsg');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
     }
 
-    function toggleFontMenu(e) {
-      if (e) e.stopPropagation();
-      const menu = document.getElementById('fontDropdown');
-      menu.classList.toggle('hidden');
-    }
-
-    function changeTitleFont(key) {
-      localStorage.setItem('estacion_fuente_titulos', key);
-      applySavedFont();
-      document.getElementById('fontDropdown').classList.add('hidden');
-      showToast('Fuente actualizada', 'Aa');
-    }
-
-    // Cerrar menú de fuentes al tocar afuera
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('fontDropdown');
-      const btn = document.getElementById('btnFontMenu');
-      if (menu && !menu.contains(e.target) && e.target !== btn) {
-        menu.classList.add('hidden');
-      }
-    });
-
-    // --- DATOS INICIALES ---
+    /* Datos reales completos por defecto */
     const DEFAULT_DATA = {
       renaico: [
-        { 
-          id: 'r1', 
-          cat: 'llevar_tec', 
-          title: 'Computador y estación de trabajo', 
-          summary: 'Cargador original, mouse y soporte', 
-          detail: '• Revisar cargador de alta potencia (no dejar el transformador en el enchufe).\n• Mouse inalámbrico + pila de repuesto.\n• Reposa muñeca ergonómico.\n• Dongle o conector USB multipuertos.\n• Audífonos bluetooth con estuche cargado.',
-          checked: true 
-        },
-        { 
-          id: 'r2', 
-          cat: 'llevar_tec', 
-          title: 'Cargadores y periféricos de celular', 
-          summary: 'Cables USB-C, adaptadores y apoya teléfono', 
-          detail: '• Llevar soporte para ver clases o videos sin cansancio de cuello.\n• Al menos 2 cables USB-C en buen estado.\n• Bloque de carga rápida para la noche.',
-          checked: true 
-        },
-        { 
-          id: 'r3', 
-          cat: 'llevar_skin', 
-          title: 'Rutina básica de Skincare', 
-          summary: 'Limpiador, hidratante y bloqueador solar', 
-          detail: '• Limpiador facial suave (envase bien cerrado para no derramar en la mochila).\n• Crema hidratante facial para el cambio de clima.\n• Bloqueador solar factor 50 (muy importante para reaplicar en el día).\n• Bálsamo labial o serum nocturno.',
-          checked: true 
-        },
-        { 
-          id: 'r4', 
-          cat: 'llevar_skin', 
-          title: 'Neceser de aseo y cuidado personal', 
-          summary: 'Cepillo, toalla de mano y artículos diarios', 
-          detail: '• Cepillo de dientes con protector.\n• Pasta dental de viaje.\n• Desodorante y peine de pelo.\n• Gotitas para ojos o medicamentos de rutina si hacen falta.',
-          checked: false 
-        },
-        { 
-          id: 'r5', 
-          cat: 'llevar_mat', 
-          title: 'Cuadernos y estuche universitario', 
-          summary: 'Cuaderno principal, destacadores y post-its', 
-          detail: '• Cuaderno de apuntes principal con materias del semestre.\n• Destacadores pasteles y bolígrafos negros/azules.\n• Notas adhesivas (post-its) para marcar lecturas o páginas clave.',
-          checked: true 
-        },
-        { 
-          id: 'r6', 
-          cat: 'ya_en_renaico', 
-          title: 'Secador de pelo & plancha', 
-          summary: 'Guardado en el clóset de la pieza', 
-          detail: 'No empacar desde la casa principal porque ya quedó uno listo y operativo en Renaico.',
-          checked: true 
-        },
-        { 
-          id: 'r7', 
-          cat: 'ya_en_renaico', 
-          title: 'Ropa abrigada de reserva', 
-          summary: 'Chalecos, pantuflas y almohada', 
-          detail: 'Están en el ropero de la habitación. Solo llevar ropa para la cantidad exacta de días que dura la estadía.',
-          checked: true 
-        },
-        { 
-          id: 'r8', 
-          cat: 'pendientes_alla', 
-          title: 'Revisar PC de la Junaeb', 
-          summary: 'Buscar cuaderno de telecomunicaciones', 
-          detail: 'Encender el PC, revisar la carpeta de descargas y documentos para rescatar apuntes anteriores y guías del ramo.',
-          checked: true 
-        },
-        { 
-          id: 'r9', 
-          cat: 'pendientes_alla', 
-          title: 'Organizar apuntes y sincronizar Drive', 
-          summary: 'Limpiar descargas y ordenar carpetas', 
-          detail: 'Aprovechar la calma para ordenar archivos por materia y verificar que todo esté respaldado en la nube.',
-          checked: false 
-        },
-        { 
-          id: 'r10', 
-          cat: 'comprar_alla', 
-          title: 'Caja organizadora plástica', 
-          summary: 'Para ordenar cables y útiles en Renaico', 
-          detail: 'Comprar en bazar o supermercado local para dejar un rincón fijo de estudio sin cables enredados.',
-          checked: false 
-        }
+        { id: 'r1', cat: 'llevar_tec', title: 'Computador y estación de trabajo', summary: 'Cargador original, mouse y soporte', detail: '• Revisar cargador de alta potencia (no dejar el transformador en el enchufe).\n• Mouse inalámbrico + pila de repuesto.\n• Reposa muñeca ergonómico.\n• Dongle o conector USB multipuertos.\n• Audífonos bluetooth con estuche cargado.', checked: true },
+        { id: 'r2', cat: 'llevar_tec', title: 'Cargadores y periféricos de celular', summary: 'Cables USB-C, adaptadores y apoya teléfono', detail: '• Llevar soporte para ver clases o videos sin cansancio de cuello.\n• Al menos 2 cables USB-C en buen estado.\n• Bloque de carga rápida para la noche.', checked: true },
+        { id: 'r3', cat: 'llevar_skin', title: 'Rutina básica de Skincare', summary: 'Limpiador, hidratante y bloqueador solar', detail: '• Limpiador facial suave (envase bien cerrado para no derramar en la mochila).\n• Crema hidratante facial para el cambio de clima.\n• Bloqueador solar factor 50 (muy importante para reaplicar en el día).\n• Bálsamo labial o serum nocturno.', checked: true },
+        { id: 'r4', cat: 'llevar_skin', title: 'Neceser de aseo y cuidado personal', summary: 'Cepillo, toalla de mano y artículos diarios', detail: '• Cepillo de dientes con protector.\n• Pasta dental de viaje.\n• Desodorante y peine de pelo.\n• Gotitas para ojos o medicamentos de rutina si hacen falta.', checked: false },
+        { id: 'r5', cat: 'llevar_mat', title: 'Cuadernos y estuche universitario', summary: 'Cuaderno principal, destacadores y post-its', detail: '• Cuaderno de apuntes principal con materias del semestre.\n• Destacadores pasteles y bolígrafos negros/azules.\n• Notas adhesivas (post-its) para marcar lecturas o páginas clave.', checked: true },
+        { id: 'r6', cat: 'ya_en_renaico', title: 'Secador de pelo & plancha', summary: 'Guardado en el clóset de la pieza', detail: 'No empacar desde la casa principal porque ya quedó uno listo y operativo en Renaico.', checked: true },
+        { id: 'r7', cat: 'ya_en_renaico', title: 'Ropa abrigada de reserva', summary: 'Chalecos, pantuflas y almohada', detail: 'Están en el ropero de la habitación. Solo llevar ropa para la cantidad exacta de días que dura la estadía.', checked: true },
+        { id: 'r8', cat: 'pendientes_alla', title: 'Revisar PC de la Junaeb', summary: 'Buscar cuaderno de telecomunicaciones', detail: 'Encender el PC, revisar la carpeta de descargas y documentos para rescatar apuntes anteriores y guías del ramo.', checked: true },
+        { id: 'r9', cat: 'pendientes_alla', title: 'Organizar apuntes y sincronizar Drive', summary: 'Limpiar descargas y ordenar carpetas', detail: 'Aprovechar la calma para ordenar archivos por materia y verificar que todo esté respaldado en la nube.', checked: false },
+        { id: 'r10', cat: 'comprar_alla', title: 'Caja organizadora plástica', summary: 'Para ordenar cables y útiles en Renaico', detail: 'Comprar en bazar o supermercado local para dejar un rincón fijo de estudio sin cables enredados.', checked: false }
       ],
-
       instituto: [
-        { 
-          id: 'i1', 
-          cat: 'estudio', 
-          title: 'Bloques de enfoque: 45 min estudio / 15 min descanso', 
-          summary: '1 o 2 bloques diarios por ramo difícil', 
-          detail: '• Poner temporizador visible (sin mirar notificaciones de redes sociales).\n• Durante los 45m: solo un tema específico.\n• En los 15m de descanso: pararse, tomar agua o caminar (no quedarse pegada en la pantalla).',
-          checked: false 
-        },
-        { 
-          id: 'i2', 
-          cat: 'estudio', 
-          title: 'Técnica de Pizarra / Explicación activa', 
-          summary: 'Explicar conceptos en voz alta o diagramar', 
-          detail: '• Escribir mapas mentales en pizarra o cuaderno borrador.\n• Explicar la materia como si se la enseñaras a alguien que no sabe nada.\n• Si te trabas en una parte, ahí está el vacío que hay que releer.',
-          checked: false 
-        },
-        { 
-          id: 'i3', 
-          cat: 'estudio', 
-          title: 'Resúmenes semanales compactos', 
-          summary: 'No dejar acumular para la semana de prueba', 
-          detail: 'Dedicar 30 minutos los viernes o domingos a resumir las ideas clave de cada clase de la semana.',
-          checked: false 
-        },
-        { 
-          id: 'i4', 
-          cat: 'evaluaciones', 
-          title: 'Sueño reparador pre-prueba', 
-          summary: 'Dormir mínimo 7h 30m la noche anterior', 
-          detail: 'Estudiar de noche sin dormir sabotea la memoria de trabajo. Dormir fija los conceptos en el cerebro.',
-          checked: false 
-        },
-        { 
-          id: 'i5', 
-          cat: 'evaluaciones', 
-          title: 'Protocolo de estudio con 3 días de anticipación', 
-          summary: 'Simulacros y ejercicios tipo certamen', 
-          detail: '• Día 3 antes: Repaso de conceptos y fórmulas.\n• Día 2 antes: Resolver guías y exámenes de años anteriores sin mirar respuestas.\n• Día 1 antes: Repaso ligero y descanso mental temprano.',
-          checked: false 
-        },
-        { 
-          id: 'i6', 
-          cat: 'estructura', 
-          title: 'Descarga y análisis de programas de ramos', 
-          summary: 'Ponderaciones de tests, certámenes y talleres', 
-          detail: 'Anotar en el calendario qué porcentaje vale cada evaluación y los requisitos de asistencia o eximición.',
-          checked: true 
-        },
-        { 
-          id: 'i7', 
-          cat: 'estructura', 
-          title: 'Creación de carpetas dedicadas en Drive', 
-          summary: '1 carpeta por asignatura con guías y lecturas', 
-          detail: 'Estructura recomendada: /Semestre -> /Nombre Ramo -> /Guías, /Apuntes, /Evaluaciones.',
-          checked: true 
-        },
-        { 
-          id: 'i8', 
-          cat: 'toma_ramos', 
-          title: 'Verificación de prelaciones (ramos requisito)', 
-          summary: 'Asegurar continuidad de la malla', 
-          detail: 'Revisar qué asignaturas abren los ramos clave del próximo semestre para priorizar sus cupos primero.',
-          checked: true 
-        },
-        { 
-          id: 'i9', 
-          cat: 'toma_ramos', 
-          title: 'Plan A y Plan B de horarios y secciones', 
-          summary: 'Evitar topes y ventanas excesivas', 
-          detail: 'Tener pre-armados dos horarios alternativos con los códigos de sección por si la primera opción se agota.',
-          checked: true 
-        }
+        { id: 'i1', cat: 'estudio', title: 'Bloques de enfoque: 45 min estudio / 15 min descanso', summary: '1 o 2 bloques diarios por ramo difícil', detail: '• Poner temporizador visible (sin mirar notificaciones de redes sociales).\n• Durante los 45m: solo un tema específico.\n• En los 15m de descanso: pararse, tomar agua o caminar (no quedarse pegada en la pantalla).', checked: false },
+        { id: 'i2', cat: 'estudio', title: 'Técnica de Pizarra / Explicación activa', summary: 'Explicar conceptos en voz alta o diagramar', detail: '• Escribir mapas mentales en pizarra o cuaderno borrador.\n• Explicar la materia como si se la enseñaras a alguien que no sabe nada.\n• Si te trabas en una parte, ahí está el vacío que hay que releer.', checked: false },
+        { id: 'i3', cat: 'estudio', title: 'Resúmenes semanales compactos', summary: 'No dejar acumular para la semana de prueba', detail: 'Dedicar 30 minutos los viernes o domingos a resumir las ideas clave de cada clase de la semana.', checked: false },
+        { id: 'i4', cat: 'evaluaciones', title: 'Sueño reparador pre-prueba', summary: 'Dormir mínimo 7h 30m la noche anterior', detail: 'Estudiar de noche sin dormir sabotea la memoria de trabajo. Dormir fija los conceptos en el cerebro.', checked: false },
+        { id: 'i5', cat: 'evaluaciones', title: 'Protocolo de estudio con 3 días de anticipación', summary: 'Simulacros y ejercicios tipo certamen', detail: '• Día 3 antes: Repaso de conceptos y fórmulas.\n• Día 2 antes: Resolver guías y exámenes de años anteriores sin mirar respuestas.\n• Día 1 antes: Repaso ligero y descanso mental temprano.', checked: false },
+        { id: 'i6', cat: 'estructura', title: 'Descarga y análisis de programas de ramos', summary: 'Ponderaciones de tests, certámenes y talleres', detail: 'Anotar en el calendario qué porcentaje vale cada evaluación y los requisitos de asistencia o eximición.', checked: true },
+        { id: 'i7', cat: 'estructura', title: 'Creación de carpetas dedicadas en Drive', summary: '1 carpeta por asignatura con guías y lecturas', detail: 'Estructura recomendada: /Semestre -> /Nombre Ramo -> /Guías, /Apuntes, /Evaluaciones.', checked: true },
+        { id: 'i8', cat: 'toma_ramos', title: 'Verificación de prelaciones (ramos requisito)', summary: 'Asegurar continuidad de la malla', detail: 'Revisar qué asignaturas abren los ramos clave del próximo semestre para priorizar sus cupos primero.', checked: true },
+        { id: 'i9', cat: 'toma_ramos', title: 'Plan A y Plan B de horarios y secciones', summary: 'Evitar topes y ventanas excesivas', detail: 'Tener pre-armados dos horarios alternativos con los códigos de sección por si la primera opción se agota.', checked: true }
       ]
     };
 
@@ -579,410 +907,407 @@
       ]
     };
 
-    let catData = JSON.parse(localStorage.getItem('estacion_categorias') || 'null') || JSON.parse(JSON.stringify(DEFAULT_CATS));
-    function saveCats() { localStorage.setItem('estacion_categorias', JSON.stringify(catData)); }
-    function getCats() { return catData[currentTab]; }
-    function isPackingCat(key) { const c = catData.renaico.find(x => x.key === key); return !!(c && c.packing); }
+    let appData = JSON.parse(localStorage.getItem(KEY_DATA) || 'null') || DEFAULT_DATA;
+    let catData = JSON.parse(localStorage.getItem(KEY_CATS) || 'null') || DEFAULT_CATS;
 
-    let currentTab = 'renaico';
+    let currentSection = 'renaico';
     let searchQuery = '';
-    let openCats = {};
-    let appData = JSON.parse(localStorage.getItem('estacion_detallada_data') || JSON.stringify(DEFAULT_DATA));
+    let openCats = { llevar_tec: true, estudio: true }; // Primeras abiertas por comodidad
+    let selectedDetailId = null;
 
-    function saveData() {
-      localStorage.setItem('estacion_detallada_data', JSON.stringify(appData));
-      updateProgress();
+    function saveAll() {
+      localStorage.setItem(KEY_DATA, JSON.stringify(appData));
+      localStorage.setItem(KEY_CATS, JSON.stringify(catData));
+      updatePackingProgress();
     }
 
-    function showToast(text, icon = '✨') {
-      const toast = document.getElementById('toastMessage');
-      document.getElementById('toastText').innerText = text;
-      document.getElementById('toastIcon').innerText = icon;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2000);
+    /* ─── TEMA CLARO / OSCURO ─── */
+    function applyTheme(themeName) {
+      document.documentElement.dataset.theme = themeName;
+      localStorage.setItem(KEY_THEME, themeName);
+      const isDark = themeName === 'dark';
+      $('#btnThemeToggle').textContent = isDark ? '☀️' : '🌙';
+      $('#metaThemeColor').setAttribute('content', isDark ? '#0e0d13' : '#fbf5ee');
     }
 
-    function switchTab(tab) {
-      currentTab = tab;
-      const btnRen = document.getElementById('tabBtnRenaico');
-      const btnInst = document.getElementById('tabBtnInstituto');
-      const headerTitle = document.getElementById('headerTitle');
-      const headerSubtitle = document.getElementById('headerSubtitle');
-      const headerIcon = document.getElementById('headerIcon');
-      const progressSection = document.getElementById('progressSection');
+    $('#btnThemeToggle').onclick = () => {
+      vibrar();
+      const current = document.documentElement.dataset.theme;
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+      toast(document.documentElement.dataset.theme === 'dark' ? 'Modo Oscuro' : 'Modo Claro');
+    };
 
-      if (tab === 'renaico') {
-        btnRen.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 gold-glow bg-emeraldAccent/10 border border-emeraldAccent/40 text-emerald-400";
-        btnInst.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent";
-        headerTitle.innerText = "Traslado a Renaico";
-        headerSubtitle.innerText = "Resumen & detalle para no olvidar nada";
-        headerIcon.innerText = "🏡";
-        progressSection.classList.remove('hidden');
-      } else {
-        btnInst.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 purple-glow bg-purpleAccent/10 border border-purpleAccent/40 text-purpleAccent";
-        btnRen.className = "flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent";
-        headerTitle.innerText = "Instituto & Estrategia";
-        headerSubtitle.innerText = "Guía paso a paso y métodos de estudio";
-        headerIcon.innerText = "🎓";
-        progressSection.classList.add('hidden');
-      }
+    /* ─── SELECTOR TIPOGRÁFICO 'Aa' ─── */
+    const FONTS = {
+      fraunces: "'Fraunces', Georgia, serif",
+      jakarta: "'Plus Jakarta Sans', system-ui, sans-serif",
+      fira: "'Fira Sans', system-ui, sans-serif",
+      chivo: "'Chivo', system-ui, sans-serif",
+      space: "'Space Grotesk', system-ui, sans-serif"
+    };
 
-      renderContent();
-    }
-
-    function toggleCat(key) {
-      openCats[key] = !openCats[key];
-      renderContent();
-      if (navigator.vibrate) navigator.vibrate(8);
-    }
-
-    function openAddCatModal() {
-      document.getElementById('newCatName').value = '';
-      document.getElementById('newCatPacking').checked = false;
-      const row = document.getElementById('newCatPackingRow');
-      row.classList.toggle('hidden', currentTab !== 'renaico');
-      row.classList.toggle('flex', currentTab === 'renaico');
-      const m = document.getElementById('modalAddCat');
-      m.classList.remove('hidden'); m.classList.add('flex');
-      setTimeout(() => document.getElementById('newCatName').focus(), 120);
-    }
-
-    function closeAddCatModal() {
-      const m = document.getElementById('modalAddCat');
-      m.classList.add('hidden'); m.classList.remove('flex');
-    }
-
-    function saveNewCat() {
-      const name = document.getElementById('newCatName').value.trim();
-      if (!name) { showToast('Escribe un nombre', '⚠️'); return; }
-      const cat = {
-        key: 'c_' + Date.now().toString(36),
-        name: name,
-        packing: currentTab === 'renaico' && document.getElementById('newCatPacking').checked
-      };
-      catData[currentTab].push(cat);
-      saveCats();
-      openCats[cat.key] = true;
-      closeAddCatModal();
-      renderContent();
-      showToast('Categoría creada', '✅');
-    }
-
-    let pendingConfirm = null;
-    function openConfirm(title, text, fn) {
-      document.getElementById('confirmTitle').innerText = title;
-      document.getElementById('confirmText').innerText = text;
-      pendingConfirm = fn;
-      const m = document.getElementById('modalConfirm');
-      m.classList.remove('hidden'); m.classList.add('flex');
-    }
-    function closeConfirm() {
-      const m = document.getElementById('modalConfirm');
-      m.classList.add('hidden'); m.classList.remove('flex');
-      pendingConfirm = null;
-    }
-    function runConfirm() { const fn = pendingConfirm; closeConfirm(); if (fn) fn(); }
-
-    function askDeleteCat(key) {
-      const cat = getCats().find(c => c.key === key);
-      if (!cat) return;
-      const n = appData[currentTab].filter(x => x.cat === key).length;
-      openConfirm(
-        'Eliminar "' + cat.name + '"',
-        n > 0 ? 'Se eliminarán también las ' + n + ' tarea(s) que contiene. No se puede deshacer.' : 'La categoría está vacía.',
-        () => deleteCat(key)
-      );
-    }
-    function deleteCat(key) {
-      catData[currentTab] = catData[currentTab].filter(c => c.key !== key);
-      appData[currentTab] = appData[currentTab].filter(x => x.cat !== key);
-      delete openCats[key];
-      saveCats();
-      saveData();
-      renderContent();
-      showToast('Categoría eliminada', '🗑️');
-    }
-
-    let openItemId = null;
-
-    function paintDetail() {
-      const item = appData[currentTab].find(x => x.id === openItemId);
-      if (!item) return closeDetail(true);
-      const cat = getCats().find(c => c.key === item.cat);
-      document.getElementById('detailCat').innerText = cat ? cat.name : '';
-      const t = document.getElementById('detailTitle');
-      t.innerText = item.title;
-      t.classList.toggle('strikethrough-title', !!item.checked);
-      const sum = document.getElementById('detailSummary');
-      sum.style.display = item.summary ? 'inline-flex' : 'none';
-      sum.innerText = item.summary ? '📌 ' + item.summary : '';
-      document.getElementById('detailBody').innerText = item.detail || 'Sin detalles adicionales registrados.';
-      const btn = document.getElementById('detailCheckBtn');
-      btn.innerText = item.checked ? '↩︎ Desmarcar' : '✓ Marcar como listo';
-      btn.className = 'py-3 rounded-xl font-bold text-sm active:scale-95 transition ' +
-        (item.checked ? 'bg-cardElevated border border-borderSubtle text-textMuted'
-                      : 'bg-gradient-to-r from-emerald-500 to-teal-400 text-[#0e0d13]');
-    }
-
-    function openDetail(id) {
-      openItemId = id;
-      paintDetail();
-      const v = document.getElementById('detailView');
-      v.classList.remove('hidden');
-      v.classList.add('flex');
-      v.querySelector('.overflow-y-auto').scrollTop = 0;
-      document.body.style.overflow = 'hidden';
-      try { history.pushState({ detail: true }, ''); } catch (e) {}
-      if (navigator.vibrate) navigator.vibrate(8);
-    }
-
-    function closeDetail(skipHistory) {
-      const v = document.getElementById('detailView');
-      if (v.classList.contains('hidden')) return;
-      v.classList.add('hidden');
-      v.classList.remove('flex');
-      document.body.style.overflow = '';
-      openItemId = null;
-      if (skipHistory !== 'pop') { try { if (history.state && history.state.detail) history.back(); } catch (e) {} }
-    }
-
-    function toggleCheckFromDetail() {
-      toggleCheck(openItemId);
-      paintDetail();
-    }
-
-    function deleteFromDetail() {
-      const id = openItemId;
-      closeDetail();
-      deleteItem(id);
-    }
-
-    window.addEventListener('popstate', () => closeDetail('pop'));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
-
-    function toggleCheck(id, e) {
-      if (e) e.stopPropagation();
-      const list = appData[currentTab];
-      const item = list.find(x => x.id === id);
-      if (item) {
-        item.checked = !item.checked;
-        saveData();
-        renderContent();
-        if (item.checked && navigator.vibrate) navigator.vibrate(18);
-      }
-    }
-
-    function deleteItem(id, e) {
-      if (e) e.stopPropagation();
-      appData[currentTab] = appData[currentTab].filter(x => x.id !== id);
-      saveData();
-      renderContent();
-      showToast('Elemento eliminado', '🗑️');
-    }
-
-    function resetPackingChecklist() {
-      appData.renaico.forEach(item => {
-        if (isPackingCat(item.cat)) {
-          item.checked = false;
-        }
+    function setFont(key) {
+      localStorage.setItem(KEY_FONT, key);
+      const val = FONTS[key] || FONTS.fraunces;
+      document.documentElement.style.setProperty('--font-title', val);
+      
+      // Actualizar marcas en menú
+      Object.keys(FONTS).forEach(k => {
+        const el = $(`#chk-${k}`);
+        if (el) el.textContent = k === key ? '✓' : '';
       });
-      saveData();
-      renderContent();
-      showToast('¡Checklist listo para empacar!', '🎒');
+      $('#fontDropdown').classList.remove('open');
+      toast('Letra actualizada');
     }
 
-    function updateProgress() {
-      const packingItems = appData.renaico.filter(x => isPackingCat(x.cat));
-      const total = packingItems.length;
-      const packed = packingItems.filter(x => x.checked).length;
+    $('#btnFontToggle').onclick = e => {
+      e.stopPropagation();
+      $('#fontDropdown').classList.toggle('open');
+    };
+    document.addEventListener('click', () => $('#fontDropdown').classList.remove('open'));
+
+    /* ─── PESTAÑAS RENAICO / INSTITUTO ─── */
+    function switchSection(sec) {
+      currentSection = sec;
+      const isRen = sec === 'renaico';
+
+      $('#tabRenaico').classList.toggle('active', isRen);
+      $('#tabInstituto').classList.toggle('active', !isRen);
+
+      $('#headerIcon').textContent = isRen ? '🏡' : '🎓';
+      $('#headerTitle').textContent = isRen ? 'Traslado a Renaico' : 'Instituto & Estrategia';
+      $('#headerSubtitle').textContent = isRen ? 'Resumen & detalle para no olvidar nada' : 'Guía paso a paso y métodos de estudio';
+
+      $('#packingCard').style.display = isRen ? 'block' : 'none';
+      render();
+    }
+
+    /* ─── RENDERIZADO ─── */
+    function getCategories() {
+      return catData[currentSection] || [];
+    }
+
+    function isPacking(catKey) {
+      const c = catData.renaico.find(x => x.key === catKey);
+      return !!(c && c.packing);
+    }
+
+    function updatePackingProgress() {
+      const list = appData.renaico.filter(it => isPacking(it.cat));
+      const total = list.length;
+      const packed = list.filter(it => it.checked).length;
       const percent = total > 0 ? Math.round((packed / total) * 100) : 0;
 
-      const pText = document.getElementById('progressText');
-      const pBar = document.getElementById('progressBar');
-      if (pText && pBar) {
-        pText.innerText = `${percent}% (${packed}/${total})`;
-        pBar.style.width = `${percent}%`;
-      }
+      $('#packingPercent').textContent = `${percent}% (${packed}/${total})`;
+      $('#packingBarFill').style.width = `${percent}%`;
     }
 
-    function renderContent() {
-      const container = document.getElementById('mainContentArea');
-      const items = appData[currentTab];
-      
+    function toggleCategoryAccordion(key) {
+      vibrar();
+      openCats[key] = !openCats[key];
+      render();
+    }
+
+    function render() {
+      const q = norm(searchQuery);
+      const isSearching = q.length > 0;
+      const categories = getCategories();
+      const items = appData[currentSection] || [];
+
+      let totalVisibles = 0;
       let html = '';
 
-      getCats().forEach(catInfo => {
-        const catKey = catInfo.key;
-        let catItems = items.filter(x => x.cat === catKey);
+      categories.forEach(cat => {
+        let catItems = items.filter(x => x.cat === cat.key);
 
-        if (searchQuery.trim() !== '') {
-          const q = searchQuery.toLowerCase();
+        if (isSearching) {
           catItems = catItems.filter(x => 
-            x.title.toLowerCase().includes(q) || 
-            (x.summary && x.summary.toLowerCase().includes(q)) ||
-            (x.detail && x.detail.toLowerCase().includes(q))
+            norm(x.title).includes(q) || 
+            norm(x.summary).includes(q) || 
+            norm(x.detail).includes(q)
           );
         }
 
-        const catOpen = !!openCats[catKey] || searchQuery.trim() !== '';
-        const totalInCat = catItems.length;
-        const checkedInCat = catItems.filter(x => x.checked).length;
+        totalVisibles += catItems.length;
+        const isOpen = isSearching || !!openCats[cat.key];
+        const doneCount = catItems.filter(x => x.checked).length;
 
         html += `
-          <div class="bg-cardBase border border-borderSubtle rounded-2xl overflow-hidden shadow-sm">
-            <!-- Header Categoría -->
-            <div onclick="toggleCat('${catKey}')" class="flex items-center justify-between p-3 bg-cardElevated/50 ${catOpen ? 'border-b border-borderSubtle/60' : ''} cursor-pointer select-none active:bg-cardElevated transition">
-              <div class="flex items-center gap-2">
-                <h2 class="text-xs font-bold text-textMain tracking-tight font-title">
-                  ${catInfo.name}
-                </h2>
-              </div>
-              <div class="flex items-center">
-              <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-cardBase border border-borderSubtle text-textMuted font-semibold">
-                ${checkedInCat}/${totalInCat}
+          <div class="cat-accordion ${isOpen ? 'open' : ''}">
+            <div class="cat-header" onclick="toggleCategoryAccordion('${cat.key}')">
+              <span class="cat-title-text font-title">
+                ${esc(cat.name)}
               </span>
-              <span class="text-[11px] text-textMuted transition-transform duration-200 ml-2 ${catOpen ? 'rotate-180 text-goldAccent' : ''}">▼</span>
+              <div class="cat-badge-wrap">
+                <span class="cat-counter">${doneCount}/${catItems.length}</span>
+                <span class="cat-arrow">▼</span>
               </div>
             </div>
-
-            <!-- Listado con Tarjetas Resumen + Detalle Desplegable -->
-            ${catOpen ? `<div class="p-2 space-y-2">
+            <div class="cat-content">
               ${catItems.length === 0 ? `
-                <p class="text-center py-3 text-xs text-textMuted italic">No hay tareas o elementos aquí</p>
-              ` : ''}
-
-              ${catItems.map(item => {
-                return `
-                  <div class="rounded-xl border border-borderSubtle/60 bg-cardElevated/40 active:border-goldAccent/40 transition-all duration-200 overflow-hidden">
-                    <div
-                      onclick="openDetail('${item.id}')"
-                      class="p-2.5 flex items-start justify-between gap-2.5 cursor-pointer hover:bg-cardElevated/80 active:bg-cardElevated transition select-none">
-                      <div class="flex items-start gap-2.5 flex-1 min-w-0">
-                        <input
-                          type="checkbox"
-                          ${item.checked ? 'checked' : ''}
-                          onclick="toggleCheck('${item.id}', event)"
-                          class="mt-1 w-4 h-4 rounded-md border-borderSubtle text-emeraldAccent focus:ring-0 focus:ring-offset-0 bg-cardBase accent-emerald-500 cursor-pointer shrink-0"
-                        >
-                        <div class="flex-1 min-w-0">
-                          <p class="text-xs text-textMain font-semibold leading-snug break-words ${item.checked ? 'strikethrough-title' : ''}">
-                            ${item.title}
-                          </p>
-                          ${item.summary ? `
-                            <div class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-[#0e0d13]/70 border border-borderSubtle text-[11px] text-goldSoft font-medium">
-                              <span>📌</span>
-                              <span class="truncate">${item.summary}</span>
-                            </div>
-                          ` : ''}
-                        </div>
-                      </div>
-                      <div class="flex items-center shrink-0 pt-0.5">
-                        <span class="text-base text-textMuted">›</span>
-                      </div>
-                    </div>
+                <div style="font-size:0.75rem;color:var(--muted);font-style:italic;text-align:center;padding:12px 0;">
+                  No hay tareas registradas aquí.
+                </div>
+              ` : catItems.map(it => `
+                <div class="task-row" onclick="openDetailModal('${it.id}')">
+                  <button class="task-checkbox ${it.checked ? 'checked' : ''}" onclick="toggleItemCheck('${it.id}', event)">
+                    ${it.checked ? '✓' : ''}
+                  </button>
+                  <div class="task-body">
+                    <div class="task-title ${it.checked ? 'done' : ''}">${esc(it.title)}</div>
+                    ${it.summary ? `<div class="task-summary-pill"><span>📌</span><span>${esc(it.summary)}</span></div>` : ''}
                   </div>
-                `;
-              }).join('')}
-              <div class="flex justify-end pt-1">
-                <button onclick="askDeleteCat('${catKey}')" class="text-[11px] text-rose-400 hover:text-rose-300 font-medium px-2 py-1">Eliminar categoría</button>
+                  <span class="task-arrow">›</span>
+                </div>
+              `).join('')}
+              <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+                <button onclick="confirmDeleteCat('${cat.key}')" style="font-size:0.72rem;color:var(--rose);background:none;border:none;cursor:pointer;padding:4px 6px;">
+                  Eliminar categoría
+                </button>
               </div>
-            </div>` : ''}
+            </div>
           </div>
         `;
       });
 
-      html += `
-        <button onclick="openAddCatModal()" class="w-full py-3 rounded-2xl border border-dashed border-borderSubtle text-xs font-semibold text-textMuted hover:text-textMain hover:border-goldAccent/50 active:scale-95 transition">
-          + Nueva categoría
-        </button>`;
-      container.innerHTML = html;
-      updateProgress();
+      $('#totalItemsCount').textContent = totalVisibles;
+      $('#mainContentArea').innerHTML = html;
+      updatePackingProgress();
     }
 
-    function openAddItemModal() {
-      const select = document.getElementById('newItemCategory');
-      if (getCats().length === 0) { showToast('Primero crea una categoría', '⚠️'); return; }
-      document.getElementById('modalTitle').innerText = currentTab === 'renaico' ? 'Agregar a Renaico' : 'Agregar a Instituto';
-      select.innerHTML = getCats().map(c => `<option value="${c.key}">${c.name}</option>`).join('');
+    /* ─── MODAL DE DETALLE EN EL CENTRO ─── */
+    function openDetailModal(id) {
+      vibrar();
+      selectedDetailId = id;
+      const it = (appData[currentSection] || []).find(x => x.id === id);
+      if (!it) return;
 
-      document.getElementById('newItemTitle').value = '';
-      document.getElementById('newItemSummary').value = '';
-      document.getElementById('newItemDetail').value = '';
-      document.getElementById('modalAddItem').classList.remove('hidden');
-      document.getElementById('modalAddItem').classList.add('flex');
-      setTimeout(() => document.getElementById('newItemTitle').focus(), 120);
+      const cat = getCategories().find(c => c.key === it.cat);
+      $('#detCatBadge').textContent = cat ? cat.name : 'Elemento';
+      $('#detTitle').textContent = it.title;
+      
+      const sBox = $('#detSummaryBox');
+      if (it.summary) {
+        sBox.style.display = 'block';
+        $('#detSummaryTxt').textContent = it.summary;
+      } else {
+        sBox.style.display = 'none';
+      }
+
+      $('#detBodyTxt').textContent = it.detail || 'Sin especificaciones ni pasos detallados.';
+      
+      const btnCheck = $('#detToggleCheck');
+      btnCheck.textContent = it.checked ? '↩︎ Desmarcar tarea' : '✓ Marcar como lista';
+      btnCheck.className = it.checked ? 'btn btn-secondary' : 'btn btn-primary';
+
+      $('#modalDetail').classList.add('active');
     }
 
-    function closeAddItemModal() {
-      document.getElementById('modalAddItem').classList.add('hidden');
-      document.getElementById('modalAddItem').classList.remove('flex');
+    $('#detToggleCheck').onclick = () => {
+      if (!selectedDetailId) return;
+      toggleItemCheck(selectedDetailId);
+      openDetailModal(selectedDetailId); // Refresca botones
+    };
+
+    $('#detDelete').onclick = () => {
+      if (!selectedDetailId) return;
+      if (confirm('¿Eliminar esta tarea definitivamente?')) {
+        appData[currentSection] = appData[currentSection].filter(x => x.id !== selectedDetailId);
+        saveAll();
+        closeModals();
+        render();
+        toast('Tarea eliminada');
+      }
+    };
+
+    function toggleItemCheck(id, e) {
+      if (e) e.stopPropagation();
+      const it = (appData[currentSection] || []).find(x => x.id === id);
+      if (it) {
+        vibrar();
+        it.checked = !it.checked;
+        saveAll();
+        render();
+      }
     }
 
-    function saveNewItem() {
-      const title = document.getElementById('newItemTitle').value.trim();
-      const summary = document.getElementById('newItemSummary').value.trim();
-      const cat = document.getElementById('newItemCategory').value;
-      const detail = document.getElementById('newItemDetail').value.trim();
-
-      if (!title) {
-        showToast('Escribe un título para la tarea', '⚠️');
+    /* ─── FORMULARIO: NUEVA TAREA ─── */
+    function openAddTaskModal() {
+      const cats = getCategories();
+      if (!cats.length) {
+        alert('Crea primero una categoría para esta sección.');
         return;
       }
 
-      const newItem = {
+      $('#inpCategory').innerHTML = cats.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join('');
+      $('#inpTitle').value = '';
+      $('#inpSummary').value = '';
+      $('#inpDetail').value = '';
+
+      $('#modalForm').classList.add('active');
+      setTimeout(() => $('#inpTitle').focus(), 150);
+    }
+
+    $('#btnFabAdd').onclick = openAddTaskModal;
+
+    $('#btnSaveTask').onclick = () => {
+      const title = $('#inpTitle').value.trim();
+      if (!title) return alert('Ingresa al menos el título de la tarea');
+
+      vibrar();
+      const newTask = {
         id: 'usr_' + Date.now().toString(36),
-        cat: cat,
+        cat: $('#inpCategory').value,
         title: title,
-        summary: summary,
-        detail: detail,
+        summary: $('#inpSummary').value.trim(),
+        detail: $('#inpDetail').value.trim(),
         checked: false
       };
 
-      appData[currentTab].unshift(newItem);
-      saveData();
-      closeAddItemModal();
-      renderContent();
-      showToast('Guardado con detalle', '✅');
-    }
+      appData[currentSection].unshift(newTask);
+      saveAll();
+      closeModals();
+      render();
+      toast('Tarea guardada');
+    };
 
-    function toggleSearch() {
-      const container = document.getElementById('searchContainer');
-      container.classList.toggle('hidden');
-      if (!container.classList.contains('hidden')) {
-        document.getElementById('globalSearchInput').focus();
-      } else {
-        clearSearch();
+    /* ─── CREAR Y ELIMINAR CATEGORÍAS ─── */
+    $('#btnAddCategory').onclick = () => {
+      $('#inpCatName').value = '';
+      $('#inpCatPacking').checked = false;
+      $('#groupPackingCheckbox').style.display = currentSection === 'renaico' ? 'block' : 'none';
+      $('#modalCategory').classList.add('active');
+      setTimeout(() => $('#inpCatName').focus(), 150);
+    };
+
+    $('#btnSaveCategory').onclick = () => {
+      const name = $('#inpCatName').value.trim();
+      if (!name) return alert('Ingresa un nombre para la categoría');
+
+      vibrar();
+      const newCat = {
+        key: 'cat_' + Date.now().toString(36),
+        name: name,
+        packing: currentSection === 'renaico' && $('#inpCatPacking').checked
+      };
+
+      catData[currentSection].push(newCat);
+      openCats[newCat.key] = true;
+      saveAll();
+      closeModals();
+      render();
+      toast('Categoría creada');
+    };
+
+    function confirmDeleteCat(key) {
+      const cat = getCategories().find(c => c.key === key);
+      if (!cat) return;
+      const count = (appData[currentSection] || []).filter(x => x.cat === key).length;
+      if (confirm(`¿Eliminar la categoría "${cat.name}" y sus ${count} elemento(s)?`)) {
+        vibrar();
+        catData[currentSection] = catData[currentSection].filter(c => c.key !== key);
+        appData[currentSection] = appData[currentSection].filter(x => x.cat !== key);
+        saveAll();
+        render();
+        toast('Categoría eliminada');
       }
     }
 
-    function handleSearch(val) {
-      searchQuery = val;
-      renderContent();
-    }
-
-    function clearSearch() {
-      searchQuery = '';
-      document.getElementById('globalSearchInput').value = '';
-      renderContent();
-    }
-
-    function exportData() {
-      const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ ...appData, categorias: catData }, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", jsonStr);
-      downloadAnchor.setAttribute("download", `estacion_respaldo_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast('Respaldo JSON descargado', '💾');
-    }
-
-    window.onload = function() {
-      applySavedFont();
-      renderContent();
+    /* ─── RESET EMPACADO ─── */
+    $('#btnResetPacking').onclick = () => {
+      if (confirm('¿Desmarcar todo el equipaje para iniciar un nuevo viaje a Renaico?')) {
+        vibrar();
+        appData.renaico.forEach(it => {
+          if (isPacking(it.cat)) it.checked = false;
+        });
+        saveAll();
+        render();
+        toast('Checklist reiniciado para viajar');
+      }
     };
+
+    /* ─── BÚSQUEDA ─── */
+    $('#searchInput').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      $('#searchBoxContainer').classList.toggle('has-val', searchQuery.length > 0);
+      render();
+    });
+
+    $('#btnSearchClear').onclick = () => {
+      $('#searchInput').value = '';
+      searchQuery = '';
+      $('#searchBoxContainer').classList.remove('has-val');
+      render();
+    };
+
+    /* ─── RESPALDOS JSON ─── */
+    $('#btnExport').onclick = () => {
+      vibrar();
+      const payload = {
+        appData,
+        catData,
+        exportDate: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `respaldo-estacion-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      toast('Respaldo descargado');
+    };
+
+    $('#btnImport').onclick = () => $('#fileInput').click();
+
+    $('#fileInput').onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed.appData && parsed.catData) {
+            appData = parsed.appData;
+            catData = parsed.catData;
+          } else if (parsed.renaico && parsed.instituto) {
+            appData = parsed;
+          } else {
+            throw 0;
+          }
+          saveAll();
+          render();
+          toast('Respaldo cargado con éxito');
+        } catch (err) {
+          alert('El archivo no parece ser un respaldo válido.');
+        }
+        e.target.value = '';
+      };
+      r.readAsText(file);
+    };
+
+    /* ─── CONTROL DE MODALES ─── */
+    function closeModals() {
+      $$('.modal-overlay').forEach(m => m.classList.remove('active'));
+      selectedDetailId = null;
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('modal-overlay') || e.target.closest('[data-close]')) {
+        closeModals();
+      }
+    });
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModals();
+    });
+
+    /* ─── INICIALIZACIÓN ─── */
+    const savedTheme = localStorage.getItem(KEY_THEME) || 'dark';
+    applyTheme(savedTheme);
+
+    const savedFont = localStorage.getItem(KEY_FONT) || 'fraunces';
+    setFont(savedFont);
+
+    render();
   </script>
 </body>
 </html>
