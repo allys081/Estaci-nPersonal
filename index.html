@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Mi Estación · Renaico & Instituto</title>
   
+  <!-- Íconos para la pantalla de inicio (PWA / Mobile Bookmark) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231f1c2b'/%3E%3Cstop offset='1' stop-color='%230e0d13'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)' stroke='%23d4af37' stroke-width='2'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23171520'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0e0d13">
+
+  <!-- Google Fonts (Incluye las 5 fuentes del selector) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@600;700;800&family=Fira+Sans:wght@500;600;700&family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -27,25 +37,28 @@
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif']
+            customTitle: ['var(--font-title)', 'serif']
           }
         }
       }
     }
   </script>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-
   <style>
+    :root {
+      --font-title: 'Fraunces', Georgia, serif;
+    }
+
     body {
       background-color: #0e0d13;
       color: #f3eef8;
       font-family: 'Inter', system-ui, sans-serif;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+    }
+    
+    .font-title {
+      font-family: var(--font-title) !important;
     }
     
     ::-webkit-scrollbar {
@@ -76,13 +89,13 @@
 </head>
 <body class="min-h-screen pb-32 select-none antialiased">
 
-  <!-- Mobile Top Bar with Navigation and Backup -->
+  <!-- Mobile Top Bar with Navigation, Font Selector and Backup -->
   <header class="sticky top-0 z-40 bg-[#0e0d13]/92 backdrop-blur-md border-b border-borderSubtle px-4 pt-3 pb-3">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
         <span class="text-2xl" id="headerIcon">🏡</span>
         <div>
-          <h1 class="text-base font-bold tracking-tight text-textMain leading-none font-['Plus_Jakarta_Sans']" id="headerTitle">
+          <h1 class="text-base font-bold tracking-tight text-textMain leading-none font-title" id="headerTitle">
             Traslado a Renaico
           </h1>
           <p class="text-[11px] text-textMuted mt-0.5" id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
@@ -90,13 +103,47 @@
       </div>
 
       <!-- Quick Action Controls -->
-      <div class="flex items-center space-x-1.5">
+      <div class="flex items-center space-x-1.5 relative">
+        <!-- Botón Selector Tipográfico 'Aa' -->
+        <button id="btnFontMenu" onclick="toggleFontMenu(event)" title="Cambiar tipo de letra" class="px-2.5 py-1.5 rounded-xl bg-cardBase border border-borderSubtle text-textMain hover:border-goldAccent active:scale-95 transition-all text-xs font-bold tracking-wide flex items-center">
+          Aa
+        </button>
+
         <button onclick="exportData()" title="Respaldar JSON" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-goldAccent active:scale-95 transition-all text-xs flex items-center gap-1">
           💾
         </button>
         <button onclick="toggleSearch()" title="Buscar" class="p-2 rounded-xl bg-cardBase border border-borderSubtle text-textMuted hover:text-textMain active:scale-95 transition-all text-xs">
           🔍
         </button>
+
+        <!-- Menú emergente de fuentes -->
+        <div id="fontDropdown" class="hidden absolute right-0 top-11 w-56 bg-cardBase/98 backdrop-blur-xl border border-borderSubtle rounded-2xl shadow-2xl p-2 z-50">
+          <div class="text-[10px] uppercase tracking-wider font-extrabold text-textMuted px-3 py-1.5">
+            Letra de los títulos
+          </div>
+          <div class="flex flex-col gap-1 mt-1" id="fontOptions">
+            <button onclick="changeTitleFont('fraunces')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Fraunces', serif;">
+              <span>Fraunces (la de ahora)</span>
+              <span class="check-mark hidden text-purpleAccent">✓</span>
+            </button>
+            <button onclick="changeTitleFont('jakarta')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+              <span>Plus Jakarta (sin serif)</span>
+              <span class="check-mark hidden text-purpleAccent">✓</span>
+            </button>
+            <button onclick="changeTitleFont('fira')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Fira Sans', sans-serif;">
+              <span>Fira Sans</span>
+              <span class="check-mark hidden text-purpleAccent">✓</span>
+            </button>
+            <button onclick="changeTitleFont('chivo')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Chivo', sans-serif;">
+              <span>Chivo</span>
+              <span class="check-mark hidden text-purpleAccent">✓</span>
+            </button>
+            <button onclick="changeTitleFont('space')" class="font-opt text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between text-textMain hover:bg-cardElevated" style="font-family: 'Space Grotesk', sans-serif;">
+              <span>Space Grotesk</span>
+              <span class="check-mark hidden text-purpleAccent">✓</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -168,7 +215,7 @@
         onclick="switchTab('renaico')" 
         class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 gold-glow bg-emeraldAccent/10 border border-emeraldAccent/40 text-emerald-400">
         <span class="text-xl">🏡</span>
-        <span class="text-xs font-semibold mt-0.5 tracking-tight font-['Plus_Jakarta_Sans']">Renaico</span>
+        <span class="text-xs font-semibold mt-0.5 tracking-tight font-title">Renaico</span>
       </button>
 
       <!-- Tab 2: Instituto -->
@@ -177,7 +224,7 @@
         onclick="switchTab('instituto')" 
         class="flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all duration-200 text-textMuted hover:text-textMain border border-transparent">
         <span class="text-xl">🎓</span>
-        <span class="text-xs font-semibold mt-0.5 tracking-tight font-['Plus_Jakarta_Sans']">Instituto</span>
+        <span class="text-xs font-semibold mt-0.5 tracking-tight font-title">Instituto</span>
       </button>
     </div>
   </nav>
@@ -186,7 +233,7 @@
   <div id="modalAddItem" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl transition-all">
       <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] flex items-center gap-2">
+        <h3 class="font-bold text-base text-textMain font-title flex items-center gap-2">
           <span>✨</span> <span id="modalTitle">Nueva Tarea / Item</span>
         </h3>
         <button onclick="closeAddItemModal()" class="w-8 h-8 rounded-full bg-cardElevated flex items-center justify-center text-textMuted hover:text-textMain">✕</button>
@@ -241,7 +288,7 @@
   <!-- Modal: Nueva categoría -->
   <div id="modalAddCat" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
-      <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] mb-3">Nueva categoría</h3>
+      <h3 class="font-bold text-base text-textMain font-title mb-3">Nueva categoría</h3>
       <label class="block text-textMuted font-medium mb-1 text-xs">Nombre</label>
       <input type="text" id="newCatName" placeholder="Ej: Ropa, Medicamentos, Ramos del semestre..."
         class="w-full bg-cardElevated border border-borderSubtle rounded-xl p-2.5 text-xs text-textMain placeholder-textMuted focus:outline-none focus:border-goldAccent">
@@ -259,7 +306,7 @@
   <!-- Modal: Confirmar -->
   <div id="modalConfirm" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-cardBase border border-borderSubtle rounded-3xl w-full max-w-sm p-5 shadow-2xl">
-      <h3 class="font-bold text-base text-textMain font-['Plus_Jakarta_Sans'] mb-2" id="confirmTitle"></h3>
+      <h3 class="font-bold text-base text-textMain font-title mb-2" id="confirmTitle"></h3>
       <p class="text-xs text-textMuted leading-relaxed" id="confirmText"></p>
       <div class="grid grid-cols-2 gap-2 mt-4">
         <button onclick="closeConfirm()" class="py-2.5 rounded-xl bg-cardElevated text-textMuted hover:text-textMain font-medium text-xs">Cancelar</button>
@@ -279,7 +326,7 @@
 
     <div class="flex-1 overflow-y-auto px-5 py-6">
       <div class="max-w-xl mx-auto">
-        <h2 id="detailTitle" class="text-2xl font-extrabold leading-tight text-textMain font-['Plus_Jakarta_Sans'] break-words"></h2>
+        <h2 id="detailTitle" class="text-2xl font-extrabold leading-tight text-textMain font-title break-words"></h2>
         <div id="detailSummary" class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg bg-cardBase border border-borderSubtle text-sm text-goldSoft font-medium"></div>
 
         <div class="mt-6 p-5 rounded-2xl bg-cardBase border border-goldAccent/30 gold-glow">
@@ -306,10 +353,57 @@
   </div>
 
   <script>
-    // --- DATOS INICIALES CON MODELO RESUMEN + DETALLE COMPLETO DESPLEGABLE ---
+    // --- GESTIÓN DE FUENTES TIPOGRÁFICAS ---
+    const FONT_FAMILIES = {
+      fraunces: "'Fraunces', Georgia, serif",
+      jakarta: "'Plus Jakarta Sans', system-ui, sans-serif",
+      fira: "'Fira Sans', system-ui, sans-serif",
+      chivo: "'Chivo', system-ui, sans-serif",
+      space: "'Space Grotesk', system-ui, sans-serif"
+    };
+
+    function applySavedFont() {
+      const savedKey = localStorage.getItem('estacion_fuente_titulos') || 'fraunces';
+      const fontVal = FONT_FAMILIES[savedKey] || FONT_FAMILIES.fraunces;
+      document.documentElement.style.setProperty('--font-title', fontVal);
+
+      // Actualizar estilo visual activo en el menú
+      document.querySelectorAll('#fontOptions .font-opt').forEach(btn => {
+        btn.classList.remove('bg-cardElevated', 'text-purpleAccent');
+        btn.querySelector('.check-mark').classList.add('hidden');
+      });
+      const activeBtn = document.querySelector(`#fontOptions button[onclick*="${savedKey}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-cardElevated', 'text-purpleAccent');
+        activeBtn.querySelector('.check-mark').classList.remove('hidden');
+      }
+    }
+
+    function toggleFontMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('fontDropdown');
+      menu.classList.toggle('hidden');
+    }
+
+    function changeTitleFont(key) {
+      localStorage.setItem('estacion_fuente_titulos', key);
+      applySavedFont();
+      document.getElementById('fontDropdown').classList.add('hidden');
+      showToast('Fuente actualizada', 'Aa');
+    }
+
+    // Cerrar menú de fuentes al tocar afuera
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('fontDropdown');
+      const btn = document.getElementById('btnFontMenu');
+      if (menu && !menu.contains(e.target) && e.target !== btn) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    // --- DATOS INICIALES ---
     const DEFAULT_DATA = {
       renaico: [
-        // Tecnológico
         { 
           id: 'r1', 
           cat: 'llevar_tec', 
@@ -326,8 +420,6 @@
           detail: '• Llevar soporte para ver clases o videos sin cansancio de cuello.\n• Al menos 2 cables USB-C en buen estado.\n• Bloque de carga rápida para la noche.',
           checked: true 
         },
-
-        // Skincare & Aseo Personal
         { 
           id: 'r3', 
           cat: 'llevar_skin', 
@@ -344,8 +436,6 @@
           detail: '• Cepillo de dientes con protector.\n• Pasta dental de viaje.\n• Desodorante y peine de pelo.\n• Gotitas para ojos o medicamentos de rutina si hacen falta.',
           checked: false 
         },
-
-        // Material & Estudio
         { 
           id: 'r5', 
           cat: 'llevar_mat', 
@@ -354,8 +444,6 @@
           detail: '• Cuaderno de apuntes principal con materias del semestre.\n• Destacadores pasteles y bolígrafos negros/azules.\n• Notas adhesivas (post-its) para marcar lecturas o páginas clave.',
           checked: true 
         },
-
-        // Ya está en Renaico (Para no duplicar peso)
         { 
           id: 'r6', 
           cat: 'ya_en_renaico', 
@@ -372,8 +460,6 @@
           detail: 'Están en el ropero de la habitación. Solo llevar ropa para la cantidad exacta de días que dura la estadía.',
           checked: true 
         },
-
-        // Pendientes mientras estoy allá
         { 
           id: 'r8', 
           cat: 'pendientes_alla', 
@@ -390,8 +476,6 @@
           detail: 'Aprovechar la calma para ordenar archivos por materia y verificar que todo esté respaldado en la nube.',
           checked: false 
         },
-
-        // Comprar allá y dónde ponerlo
         { 
           id: 'r10', 
           cat: 'comprar_alla', 
@@ -403,7 +487,6 @@
       ],
 
       instituto: [
-        // Estudio & Enfoque TDAH-Friendly
         { 
           id: 'i1', 
           cat: 'estudio', 
@@ -428,8 +511,6 @@
           detail: 'Dedicar 30 minutos los viernes o domingos a resumir las ideas clave de cada clase de la semana.',
           checked: false 
         },
-
-        // Evaluaciones & Bienestar
         { 
           id: 'i4', 
           cat: 'evaluaciones', 
@@ -446,8 +527,6 @@
           detail: '• Día 3 antes: Repaso de conceptos y fórmulas.\n• Día 2 antes: Resolver guías y exámenes de años anteriores sin mirar respuestas.\n• Día 1 antes: Repaso ligero y descanso mental temprano.',
           checked: false 
         },
-
-        // Estructura & Organización Semestral
         { 
           id: 'i6', 
           cat: 'estructura', 
@@ -464,8 +543,6 @@
           detail: 'Estructura recomendada: /Semestre -> /Nombre Ramo -> /Guías, /Apuntes, /Evaluaciones.',
           checked: true 
         },
-
-        // Toma de Ramos & Matrícula
         { 
           id: 'i8', 
           cat: 'toma_ramos', 
@@ -485,7 +562,6 @@
       ]
     };
 
-    // Categorías (editables, se guardan en el teléfono)
     const DEFAULT_CATS = {
       renaico: [
         { key: 'llevar_tec', name: 'Tecnológico & Cables', packing: true },
@@ -502,15 +578,15 @@
         { key: 'toma_ramos', name: 'Toma de Ramos & Planificación', packing: false }
       ]
     };
+
     let catData = JSON.parse(localStorage.getItem('estacion_categorias') || 'null') || JSON.parse(JSON.stringify(DEFAULT_CATS));
     function saveCats() { localStorage.setItem('estacion_categorias', JSON.stringify(catData)); }
     function getCats() { return catData[currentTab]; }
     function isPackingCat(key) { const c = catData.renaico.find(x => x.key === key); return !!(c && c.packing); }
 
-    // Estado en memoria
     let currentTab = 'renaico';
     let searchQuery = '';
-    let openCats = {}; // categorías desplegadas (todas cerradas al inicio)
+    let openCats = {};
     let appData = JSON.parse(localStorage.getItem('estacion_detallada_data') || JSON.stringify(DEFAULT_DATA));
 
     function saveData() {
@@ -562,7 +638,6 @@
       if (navigator.vibrate) navigator.vibrate(8);
     }
 
-    // --- Crear / eliminar categorías ---
     function openAddCatModal() {
       document.getElementById('newCatName').value = '';
       document.getElementById('newCatPacking').checked = false;
@@ -573,10 +648,12 @@
       m.classList.remove('hidden'); m.classList.add('flex');
       setTimeout(() => document.getElementById('newCatName').focus(), 120);
     }
+
     function closeAddCatModal() {
       const m = document.getElementById('modalAddCat');
       m.classList.add('hidden'); m.classList.remove('flex');
     }
+
     function saveNewCat() {
       const name = document.getElementById('newCatName').value.trim();
       if (!name) { showToast('Escribe un nombre', '⚠️'); return; }
@@ -628,9 +705,7 @@
       showToast('Categoría eliminada', '🗑️');
     }
 
-    // --- Vista de detalle en pantalla grande ---
     let openItemId = null;
-
 
     function paintDetail() {
       const item = appData[currentTab].find(x => x.id === openItemId);
@@ -687,7 +762,6 @@
     window.addEventListener('popstate', () => closeDetail('pop'));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 
-    // Checkbox toggle
     function toggleCheck(id, e) {
       if (e) e.stopPropagation();
       const list = appData[currentTab];
@@ -761,7 +835,7 @@
             <!-- Header Categoría -->
             <div onclick="toggleCat('${catKey}')" class="flex items-center justify-between p-3 bg-cardElevated/50 ${catOpen ? 'border-b border-borderSubtle/60' : ''} cursor-pointer select-none active:bg-cardElevated transition">
               <div class="flex items-center gap-2">
-                <h2 class="text-xs font-bold text-textMain tracking-tight font-['Plus_Jakarta_Sans']">
+                <h2 class="text-xs font-bold text-textMain tracking-tight font-title">
                   ${catInfo.name}
                 </h2>
               </div>
@@ -906,6 +980,7 @@
     }
 
     window.onload = function() {
+      applySavedFont();
       renderContent();
     };
   </script>
