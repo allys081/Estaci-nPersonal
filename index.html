@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Mi Estación · Renaico & Instituto</title>
+  <title>Mi Estación</title>
 
   <!-- Prevención de parpadeo de tema y fuente -->
   <script>
@@ -11,6 +11,8 @@
       var t = localStorage.getItem('estacion_tema') || 'dark';
       var d = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      var a = localStorage.getItem('estacion_acento') || 'violeta';
+      document.documentElement.dataset.acc = ['violeta','rosa','celeste','agua'].indexOf(a) > -1 ? a : 'violeta';
       var f = localStorage.getItem('estacion_fuente_titulos') || 'fraunces';
       var F = {
         fraunces: "'Fraunces', Georgia, serif",
@@ -23,9 +25,10 @@
     } catch (e) {}
   </script>
 
-  <!-- Íconos de pantalla de inicio móvil (Evita el recuadro gris de Chrome) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cd6'/%3E%3Cstop offset='1' stop-color='%23d4af37'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cd6'/%3E%3Cstop offset='1' stop-color='%23d4af37'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-size='32' text-anchor='middle'%3E🏡%3C/text%3E%3C/svg%3E">
+  <!-- Íconos de pantalla de inicio (PNG + manifest: Chrome no usa SVG en línea) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#0e0d13" id="metaThemeColor">
 
   <!-- Tipografías de Google Fonts -->
@@ -638,6 +641,63 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* ─── Colores de acento ─── */
+    :root { --on-p: #fff; }
+    [data-acc=violeta] { --p:#7c5cd6; --p-soft:#ece6fb; --on-p:#fff; }
+    [data-theme=dark][data-acc=violeta] { --p:#a78bfa; --p-soft:#2b2445; --on-p:#14121a; }
+    [data-acc=rosa] { --p:#c2417a; --p-soft:#fbe1ec; --on-p:#fff; }
+    [data-theme=dark][data-acc=rosa] { --p:#f472b6; --p-soft:#40202f; --on-p:#14121a; }
+    [data-acc=celeste] { --p:#3b82c4; --p-soft:#dcebf8; --on-p:#fff; }
+    [data-theme=dark][data-acc=celeste] { --p:#7cb7ff; --p-soft:#1b2c44; --on-p:#14121a; }
+    [data-acc=agua] { --p:#2f8a76; --p-soft:#d9f0ea; --on-p:#fff; }
+    [data-theme=dark][data-acc=agua] { --p:#5eead4; --p-soft:#173b36; --on-p:#14121a; }
+    .fab, .btn-primary { color: var(--on-p) !important; }
+
+    /* Título con selector de lugar */
+    .lugar-select {
+      font-family: inherit; font-size: inherit; font-weight: inherit; color: var(--p);
+      background: var(--card-elevated); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 4px; margin-left: 2px; outline: none; max-width: 110px;
+    }
+    .lugar-select option { color: #222; font-family: system-ui, sans-serif; }
+
+    /* Menú ⋮ */
+    .dropdown-menu { width: 230px; max-height: 75vh; overflow-y: auto; }
+    .dropdown-menu .menu-item { width:100%; text-align:left; border:none; background:transparent; color:var(--text); padding:10px 12px; border-radius:10px; font-size:.86rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .dropdown-menu .menu-item:hover { background: var(--card-elevated); }
+    .dropdown-menu hr { border:0; border-top:1px dashed var(--border); margin:6px 4px; }
+    .dots { display:flex; gap:10px; padding:6px 12px 10px; }
+    .dots button { width:32px; height:32px; border-radius:50%; border:2px solid transparent; display:grid; place-items:center; color:#fff; font-size:.85rem; background:var(--c); cursor:pointer; }
+    .dots button[data-c=violeta]{--c:#7c5cd6}.dots button[data-c=rosa]{--c:#c2417a}.dots button[data-c=celeste]{--c:#3b82c4}.dots button[data-c=agua]{--c:#2f8a76}
+    [data-theme=dark] .dots button[data-c=violeta]{--c:#a78bfa}[data-theme=dark] .dots button[data-c=rosa]{--c:#f472b6}[data-theme=dark] .dots button[data-c=celeste]{--c:#7cb7ff}[data-theme=dark] .dots button[data-c=agua]{--c:#5eead4}
+    [data-theme=dark] .dots button{color:#14121a}
+    .dots button.on { border-color: var(--text); }
+    .dots button.on::after { content:"✓"; font-weight:800; }
+
+    /* Checks circulares */
+    .task-checkbox { width: 22px; height: 22px; border-radius: 50%; margin-top: 1px; }
+
+    /* Detalle largo con scroll dentro del recuadro */
+    .modal-field.scroll p { max-height: 38vh; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
+
+    /* Botón discreto "Cosas que quedaron" */
+    .cosas-btn { width:100%; margin-bottom:12px; padding:9px 12px; border-radius:12px; border:1px dashed var(--border); background:transparent; color:var(--muted); font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit; text-align:left; display:flex; justify-content:space-between; align-items:center; }
+    .cosas-btn:active { transform: scale(.98); }
+
+    /* Lista de cosas */
+    .cosa-row { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid rgba(128,128,128,.12); }
+    .cosa-row:last-child { border-bottom:none; }
+    .cosa-thumb { width:54px; height:54px; border-radius:12px; object-fit:cover; background:var(--bg); border:1px solid var(--border); flex-shrink:0; display:grid; place-items:center; font-size:1.2rem; cursor:pointer; }
+    .cosa-info { flex:1; min-width:0; }
+    .cosa-name { font-size:.88rem; font-weight:700; word-break:break-word; }
+    .cosa-loc { font-size:.74rem; color:var(--muted); margin-top:2px; word-break:break-word; }
+    .mini-btn { width:32px; height:32px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--muted); cursor:pointer; font-size:.85rem; }
+    .photo-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .pbox { position:relative; width:54px; height:54px; border-radius:12px; border:1.5px dashed var(--border); display:grid; place-items:center; overflow:hidden; background:var(--bg); }
+    .pbox img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
+    .pbox .rm { position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:50%; border:none; background:rgba(0,0,0,.65); color:#fff; font-size:.6rem; display:none; place-items:center; cursor:pointer; }
+    .mini-modal .modal-card { max-width: 420px; }
   </style>
 </head>
 <body>
@@ -645,41 +705,35 @@
     <!-- Barra Superior -->
     <header class="top-bar">
       <div class="top-left">
-        <span class="top-icon" id="headerIcon">🏡</span>
         <div class="top-titles">
-          <h1 class="font-title" id="headerTitle">Traslado a Renaico</h1>
+          <h1 class="font-title" id="headerTitle"><span id="headerTitleText">Traslado a</span> <select class="lugar-select" id="selLugar" aria-label="Lugar de traslado"><option value="renaico">Renaico</option><option value="hualqui">Hualqui</option></select></h1>
           <p id="headerSubtitle">Resumen & detalle para no olvidar nada</p>
         </div>
       </div>
 
       <div class="top-actions">
-        <!-- Toggle Modo Claro / Oscuro -->
         <button class="icon-btn" id="btnThemeToggle" title="Cambiar tema (Claro/Oscuro)">☀️</button>
-        <!-- Selector Tipográfico 'Aa' -->
-        <button class="icon-btn" id="btnFontToggle" title="Letra de los títulos">Aa</button>
-        <!-- Menú de Respaldos -->
-        <button class="icon-btn" id="btnExport" title="Respaldar JSON">💾</button>
-        <button class="icon-btn" id="btnImport" title="Cargar JSON">📂</button>
+        <button class="icon-btn" id="btnMenu" title="Más opciones" aria-label="Más opciones">⋮</button>
         <input type="file" id="fileInput" style="display:none" accept=".json">
 
-        <!-- Menú flotante de fuentes -->
         <div class="dropdown-menu" id="fontDropdown">
+          <button class="menu-item" id="btnExport">💾 Respaldar</button>
+          <button class="menu-item" id="btnImport">📂 Cargar</button>
+          <hr>
           <div class="dropdown-header">Letra de los títulos</div>
-          <button class="font-btn" onclick="setFont('fraunces')" style="font-family:'Fraunces', serif;">
-            <span>Fraunces (serif)</span><span class="check" id="chk-fraunces">✓</span>
-          </button>
-          <button class="font-btn" onclick="setFont('jakarta')" style="font-family:'Plus Jakarta Sans', sans-serif;">
-            <span>Plus Jakarta</span><span class="check" id="chk-jakarta"></span>
-          </button>
-          <button class="font-btn" onclick="setFont('fira')" style="font-family:'Fira Sans', sans-serif;">
-            <span>Fira Sans</span><span class="check" id="chk-fira"></span>
-          </button>
-          <button class="font-btn" onclick="setFont('chivo')" style="font-family:'Chivo', sans-serif;">
-            <span>Chivo</span><span class="check" id="chk-chivo"></span>
-          </button>
-          <button class="font-btn" onclick="setFont('space')" style="font-family:'Space Grotesk', sans-serif;">
-            <span>Space Grotesk</span><span class="check" id="chk-space"></span>
-          </button>
+          <button class="font-btn" data-f="fraunces" style="font-family:'Fraunces', serif;">Fraunces (la de ahora)</button>
+          <button class="font-btn" data-f="jakarta" style="font-family:'Plus Jakarta Sans', sans-serif;">Plus Jakarta (sin serif)</button>
+          <button class="font-btn" data-f="fira" style="font-family:'Fira Sans', sans-serif;">Fira Sans</button>
+          <button class="font-btn" data-f="chivo" style="font-family:'Chivo', sans-serif;">Chivo</button>
+          <button class="font-btn" data-f="space" style="font-family:'Space Grotesk', sans-serif;">Space Grotesk</button>
+          <hr>
+          <div class="dropdown-header">Color de acento</div>
+          <div class="dots" id="dots">
+            <button data-c="violeta" aria-label="Morado"></button>
+            <button data-c="rosa" aria-label="Rosa"></button>
+            <button data-c="celeste" aria-label="Celeste"></button>
+            <button data-c="agua" aria-label="Aguamarina"></button>
+          </div>
         </div>
       </div>
     </header>
@@ -711,11 +765,8 @@
       </div>
     </section>
 
-    <!-- Herramientas de conteo -->
-    <div class="tools" id="toolsBar">
-      <span class="tot">Total en esta vista: <b id="totalItemsCount">0</b></span>
-      <span style="font-size:0.72rem;color:var(--muted);">💡 Toca una fila para ver el detalle en el centro</span>
-    </div>
+    <!-- Cosas que quedaron en el lugar (solo Traslado) -->
+    <button class="cosas-btn" id="btnCosas"><span id="cosasBtnTxt">📦 Cosas que hay/quedaron en Renaico</span><span>›</span></button>
 
     <!-- Contenedor dinámico de Categorías y Tareas -->
     <main id="mainContentArea"></main>
@@ -738,7 +789,7 @@
     <div class="bottom-nav-inner">
       <button class="nav-tab-btn active" id="tabRenaico" onclick="switchSection('renaico')">
         <span>🏡</span>
-        <span class="font-title">Renaico</span>
+        <span class="font-title">Traslado</span>
       </button>
       <button class="nav-tab-btn" id="tabInstituto" onclick="switchSection('instituto')">
         <span>🎓</span>
@@ -765,13 +816,14 @@
         <p id="detSummaryTxt"></p>
       </div>
 
-      <div class="modal-field">
+      <div class="modal-field scroll">
         <label>Detalle para no olvidar</label>
         <p id="detBodyTxt"></p>
       </div>
 
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="btn btn-primary" style="flex:1;" id="detToggleCheck">✓ Marcar como lista</button>
+        <button class="btn btn-secondary" id="detEdit">✎ Editar</button>
         <button class="btn btn-danger" id="detDelete">🗑️</button>
       </div>
     </div>
@@ -839,6 +891,59 @@
     </div>
   </div>
 
+  <!-- Modal: Cosas que hay / quedaron -->
+  <div class="modal-overlay mini-modal" id="modalCosas">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.1rem;" id="cosasTitle">Cosas que quedaron en Renaico</h3>
+        <button class="modal-close-btn" data-close>✕</button>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="btnAddCosa">＋ Agregar cosa</button>
+      <div id="cosasList"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar / editar cosa -->
+  <div class="modal-overlay mini-modal" id="modalCosaForm" style="z-index:110;">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.1rem;" id="cosaFormTitle">Nueva cosa</h3>
+        <button class="modal-close-btn" data-close-cosa>✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre del objeto *</label>
+        <input type="text" id="cosaNombre" class="form-input" placeholder="Ej: Plancha, almohada..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">¿Dónde lo dejé (guardé)?</label>
+        <input type="text" id="cosaUbi" class="form-input" placeholder="Ej: Clóset de la pieza, 2º cajón..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Foto (opcional)</label>
+        <div class="photo-row">
+          <div class="pbox" id="cosaPbox"><span>📷</span><img alt=""><button type="button" class="rm" id="cosaRm">✕</button></div>
+          <button type="button" class="btn btn-secondary" id="btnCosaCam">📸 Tomar</button>
+          <button type="button" class="btn btn-secondary" id="btnCosaGal">🖼️ Elegir</button>
+          <input type="file" id="cosaFileCam" accept="image/*" capture="environment" hidden>
+          <input type="file" id="cosaFileGal" accept="image/*" hidden>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+        <button class="btn btn-secondary" data-close-cosa>Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveCosa">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visor de foto -->
+  <div class="modal-overlay" id="modalViewer" style="z-index:120;">
+    <div class="modal-card" style="text-align:center;">
+      <h3 class="font-title" id="viewerTitle" style="margin-bottom:10px;font-size:1.05rem;">Foto</h3>
+      <img id="viewerImg" src="" alt="" style="width:100%;border-radius:14px;max-height:65vh;object-fit:contain;">
+      <div style="margin-top:12px;"><button class="btn btn-secondary" data-close-viewer>Cerrar</button></div>
+    </div>
+  </div>
+
   <div class="toast" id="toastMsg">Acción guardada</div>
 
   <script>
@@ -847,6 +952,9 @@
     const KEY_CATS = 'estacion_categorias';
     const KEY_THEME = 'estacion_tema';
     const KEY_FONT = 'estacion_fuente_titulos';
+    const KEY_ACC = 'estacion_acento';
+    const KEY_COSAS = 'estacion_cosas';
+    const KEY_LUGAR = 'estacion_lugar';
 
     const $ = s => document.querySelector(s);
     const $$ = s => [...document.querySelectorAll(s)];
@@ -910,14 +1018,26 @@
     let appData = JSON.parse(localStorage.getItem(KEY_DATA) || 'null') || DEFAULT_DATA;
     let catData = JSON.parse(localStorage.getItem(KEY_CATS) || 'null') || DEFAULT_CATS;
 
+    const leerLS = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } };
+    let cosasData = leerLS(KEY_COSAS, null) || { renaico: [], hualqui: [] };
+    if (!cosasData.renaico) cosasData.renaico = [];
+    if (!cosasData.hualqui) cosasData.hualqui = [];
+    let lugar = 'renaico';
+    try { lugar = localStorage.getItem(KEY_LUGAR) === 'hualqui' ? 'hualqui' : 'renaico'; } catch (e) {}
+    const LUGAR_NOMBRE = { renaico: 'Renaico', hualqui: 'Hualqui' };
+    let editingId = null;
+
     let currentSection = 'renaico';
     let searchQuery = '';
     let openCats = { llevar_tec: true, estudio: true }; // Primeras abiertas por comodidad
     let selectedDetailId = null;
 
     function saveAll() {
-      localStorage.setItem(KEY_DATA, JSON.stringify(appData));
-      localStorage.setItem(KEY_CATS, JSON.stringify(catData));
+      try {
+        localStorage.setItem(KEY_DATA, JSON.stringify(appData));
+        localStorage.setItem(KEY_CATS, JSON.stringify(catData));
+        localStorage.setItem(KEY_COSAS, JSON.stringify(cosasData));
+      } catch (e) { alert('No hay espacio suficiente en el navegador. Haz un respaldo pronto.'); }
       updatePackingProgress();
     }
 
@@ -946,41 +1066,60 @@
       space: "'Space Grotesk', system-ui, sans-serif"
     };
 
-    function setFont(key) {
+    function setFont(key, silent) {
+      if (!FONTS[key]) key = 'fraunces';
       localStorage.setItem(KEY_FONT, key);
-      const val = FONTS[key] || FONTS.fraunces;
-      document.documentElement.style.setProperty('--font-title', val);
-      
-      // Actualizar marcas en menú
-      Object.keys(FONTS).forEach(k => {
-        const el = $(`#chk-${k}`);
-        if (el) el.textContent = k === key ? '✓' : '';
-      });
-      $('#fontDropdown').classList.remove('open');
-      toast('Letra actualizada');
+      document.documentElement.style.setProperty('--font-title', FONTS[key]);
+      $$('#fontDropdown .font-btn').forEach(b => b.classList.toggle('active', b.dataset.f === key));
+      if (!silent) toast('Letra actualizada');
     }
 
-    $('#btnFontToggle').onclick = e => {
+    function setAcc(a, silent) {
+      if (!['violeta', 'rosa', 'celeste', 'agua'].includes(a)) a = 'violeta';
+      try { localStorage.setItem(KEY_ACC, a); } catch (e) {}
+      document.documentElement.dataset.acc = a;
+      $$('#dots button').forEach(b => b.classList.toggle('on', b.dataset.c === a));
+    }
+
+    $('#btnMenu').onclick = e => {
       e.stopPropagation();
       $('#fontDropdown').classList.toggle('open');
     };
+    $('#fontDropdown').addEventListener('click', e => {
+      e.stopPropagation();
+      const f = e.target.closest('.font-btn'); if (f) setFont(f.dataset.f);
+      const d = e.target.closest('#dots button'); if (d) setAcc(d.dataset.c);
+      if (e.target.closest('#btnExport') || e.target.closest('#btnImport')) $('#fontDropdown').classList.remove('open');
+    });
     document.addEventListener('click', () => $('#fontDropdown').classList.remove('open'));
 
     /* ─── PESTAÑAS RENAICO / INSTITUTO ─── */
+    function aplicarCabecera() {
+      const isRen = currentSection === 'renaico';
+      $('#headerTitleText').textContent = isRen ? 'Traslado a' : 'Instituto';
+      $('#selLugar').style.display = isRen ? '' : 'none';
+      $('#selLugar').value = lugar;
+      $('#headerSubtitle').textContent = isRen ? 'Resumen & detalle para no olvidar nada' : 'No olvidar';
+      $('#cosasBtnTxt').textContent = `📦 Cosas que hay/quedaron en ${LUGAR_NOMBRE[lugar]}`;
+      $('#btnCosas').style.display = isRen ? 'flex' : 'none';
+    }
+
     function switchSection(sec) {
       currentSection = sec;
       const isRen = sec === 'renaico';
-
       $('#tabRenaico').classList.toggle('active', isRen);
       $('#tabInstituto').classList.toggle('active', !isRen);
-
-      $('#headerIcon').textContent = isRen ? '🏡' : '🎓';
-      $('#headerTitle').textContent = isRen ? 'Traslado a Renaico' : 'Instituto & Estrategia';
-      $('#headerSubtitle').textContent = isRen ? 'Resumen & detalle para no olvidar nada' : 'Guía paso a paso y métodos de estudio';
-
+      aplicarCabecera();
       $('#packingCard').style.display = isRen ? 'block' : 'none';
       render();
     }
+
+    $('#selLugar').onchange = e => {
+      lugar = e.target.value === 'hualqui' ? 'hualqui' : 'renaico';
+      try { localStorage.setItem(KEY_LUGAR, lugar); } catch (er) {}
+      aplicarCabecera();
+      toast('Destino: ' + LUGAR_NOMBRE[lugar]);
+    };
 
     /* ─── RENDERIZADO ─── */
     function getCategories() {
@@ -1031,6 +1170,7 @@
         totalVisibles += catItems.length;
         const isOpen = isSearching || !!openCats[cat.key];
         const doneCount = catItems.filter(x => x.checked).length;
+        const esTarea = currentSection === 'renaico'; // Instituto: apuntes, sin check ni tachado
 
         html += `
           <div class="cat-accordion ${isOpen ? 'open' : ''}">
@@ -1039,22 +1179,22 @@
                 ${esc(cat.name)}
               </span>
               <div class="cat-badge-wrap">
-                <span class="cat-counter">${doneCount}/${catItems.length}</span>
+                <span class="cat-counter">${esTarea ? doneCount + '/' + catItems.length : catItems.length}</span>
                 <span class="cat-arrow">▼</span>
               </div>
             </div>
             <div class="cat-content">
               ${catItems.length === 0 ? `
                 <div style="font-size:0.75rem;color:var(--muted);font-style:italic;text-align:center;padding:12px 0;">
-                  No hay tareas registradas aquí.
+                  ${esTarea ? 'No hay tareas registradas aquí.' : 'Aún no hay nada registrado aquí.'}
                 </div>
               ` : catItems.map(it => `
                 <div class="task-row" onclick="openDetailModal('${it.id}')">
-                  <button class="task-checkbox ${it.checked ? 'checked' : ''}" onclick="toggleItemCheck('${it.id}', event)">
+                  ${esTarea ? `<button class="task-checkbox ${it.checked ? 'checked' : ''}" onclick="toggleItemCheck('${it.id}', event)">
                     ${it.checked ? '✓' : ''}
-                  </button>
+                  </button>` : ''}
                   <div class="task-body">
-                    <div class="task-title ${it.checked ? 'done' : ''}">${esc(it.title)}</div>
+                    <div class="task-title ${esTarea && it.checked ? 'done' : ''}">${esc(it.title)}</div>
                     ${it.summary ? `<div class="task-summary-pill"><span>📌</span><span>${esc(it.summary)}</span></div>` : ''}
                   </div>
                   <span class="task-arrow">›</span>
@@ -1070,7 +1210,6 @@
         `;
       });
 
-      $('#totalItemsCount').textContent = totalVisibles;
       $('#mainContentArea').innerHTML = html;
       updatePackingProgress();
     }
@@ -1097,8 +1236,12 @@
       $('#detBodyTxt').textContent = it.detail || 'Sin especificaciones ni pasos detallados.';
       
       const btnCheck = $('#detToggleCheck');
-      btnCheck.textContent = it.checked ? '↩︎ Desmarcar tarea' : '✓ Marcar como lista';
+      const esEquipaje = currentSection === 'renaico' && isPacking(it.cat);
+      btnCheck.textContent = it.checked ? (esEquipaje ? '↩︎ Desmarcar equipaje' : '↩︎ Desmarcar tarea') : (esEquipaje ? '✓ Marcar empacado' : '✓ Marcar como lista');
       btnCheck.className = it.checked ? 'btn btn-secondary' : 'btn btn-primary';
+      const conCheck = currentSection === 'renaico';
+      btnCheck.style.display = conCheck ? '' : 'none';
+      $('#detEdit').style.flex = conCheck ? '' : '1';
 
       $('#modalDetail').classList.add('active');
     }
@@ -1109,9 +1252,18 @@
       openDetailModal(selectedDetailId); // Refresca botones
     };
 
+    $('#detEdit').onclick = () => {
+      if (!selectedDetailId) return;
+      const it = (appData[currentSection] || []).find(x => x.id === selectedDetailId);
+      if (!it) return;
+      const id = it.id;
+      closeModals();
+      openAddTaskModal(id);
+    };
+
     $('#detDelete').onclick = () => {
       if (!selectedDetailId) return;
-      if (confirm('¿Eliminar esta tarea definitivamente?')) {
+      if (confirm(currentSection === 'renaico' ? '¿Eliminar esta tarea definitivamente?' : '¿Eliminar este elemento definitivamente?')) {
         appData[currentSection] = appData[currentSection].filter(x => x.id !== selectedDetailId);
         saveAll();
         closeModals();
@@ -1132,43 +1284,57 @@
     }
 
     /* ─── FORMULARIO: NUEVA TAREA ─── */
-    function openAddTaskModal() {
+    function openAddTaskModal(editId) {
       const cats = getCategories();
       if (!cats.length) {
         alert('Crea primero una categoría para esta sección.');
         return;
       }
+      editingId = (typeof editId === 'string') ? editId : null;
+      const it = editingId ? (appData[currentSection] || []).find(x => x.id === editingId) : null;
 
       $('#inpCategory').innerHTML = cats.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join('');
-      $('#inpTitle').value = '';
-      $('#inpSummary').value = '';
-      $('#inpDetail').value = '';
+      const esT = currentSection === 'renaico';
+      $('#formModalTitle').textContent = it ? (esT ? 'Editar Tarea' : 'Editar') : (esT ? 'Nueva Tarea' : 'Nuevo apunte');
+      $('#inpTitle').value = it ? it.title : '';
+      $('#inpSummary').value = it ? it.summary : '';
+      $('#inpDetail').value = it ? it.detail : '';
+      if (it) $('#inpCategory').value = it.cat;
 
       $('#modalForm').classList.add('active');
       setTimeout(() => $('#inpTitle').focus(), 150);
     }
 
-    $('#btnFabAdd').onclick = openAddTaskModal;
+    $('#btnFabAdd').onclick = () => openAddTaskModal();
 
     $('#btnSaveTask').onclick = () => {
       const title = $('#inpTitle').value.trim();
       if (!title) return alert('Ingresa al menos el título de la tarea');
 
       vibrar();
-      const newTask = {
-        id: 'usr_' + Date.now().toString(36),
-        cat: $('#inpCategory').value,
-        title: title,
-        summary: $('#inpSummary').value.trim(),
-        detail: $('#inpDetail').value.trim(),
-        checked: false
-      };
-
-      appData[currentSection].unshift(newTask);
+      if (editingId) {
+        const it = (appData[currentSection] || []).find(x => x.id === editingId);
+        if (it) {
+          it.title = title;
+          it.summary = $('#inpSummary').value.trim();
+          it.detail = $('#inpDetail').value.trim();
+          it.cat = $('#inpCategory').value;
+        }
+      } else {
+        appData[currentSection].unshift({
+          id: 'usr_' + Date.now().toString(36),
+          cat: $('#inpCategory').value,
+          title: title,
+          summary: $('#inpSummary').value.trim(),
+          detail: $('#inpDetail').value.trim(),
+          checked: false
+        });
+      }
       saveAll();
       closeModals();
       render();
-      toast('Tarea guardada');
+      toast(editingId ? 'Tarea actualizada' : 'Tarea guardada');
+      editingId = null;
     };
 
     /* ─── CREAR Y ELIMINAR CATEGORÍAS ─── */
@@ -1215,7 +1381,7 @@
 
     /* ─── RESET EMPACADO ─── */
     $('#btnResetPacking').onclick = () => {
-      if (confirm('¿Desmarcar todo el equipaje para iniciar un nuevo viaje a Renaico?')) {
+      if (confirm('¿Desmarcar todo el equipaje para iniciar un nuevo viaje?')) {
         vibrar();
         appData.renaico.forEach(it => {
           if (isPacking(it.cat)) it.checked = false;
@@ -1246,6 +1412,8 @@
       const payload = {
         appData,
         catData,
+        cosasData,
+        lugar,
         exportDate: new Date().toISOString()
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1268,12 +1436,15 @@
           if (parsed.appData && parsed.catData) {
             appData = parsed.appData;
             catData = parsed.catData;
+            if (parsed.cosasData) cosasData = { renaico: [], hualqui: [], ...parsed.cosasData };
+            if (parsed.lugar) { lugar = parsed.lugar === 'hualqui' ? 'hualqui' : 'renaico'; try { localStorage.setItem(KEY_LUGAR, lugar); } catch (e2) {} }
           } else if (parsed.renaico && parsed.instituto) {
             appData = parsed;
           } else {
             throw 0;
           }
           saveAll();
+          aplicarCabecera();
           render();
           toast('Respaldo cargado con éxito');
         } catch (err) {
@@ -1284,6 +1455,102 @@
       r.readAsText(file);
     };
 
+    /* ─── COSAS QUE HAY / QUEDARON ─── */
+    let cosaFoto = null, cosaEditId = null;
+
+    function comprimir(file, max, cb) {
+      const r = new FileReader();
+      r.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement('canvas');
+          cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          cb(cv.toDataURL('image/jpeg', .65));
+        };
+        img.src = e.target.result;
+      };
+      r.readAsDataURL(file);
+    }
+
+    function verFoto(src, titulo) {
+      $('#viewerImg').src = src;
+      $('#viewerTitle').textContent = titulo || 'Foto';
+      $('#modalViewer').classList.add('active');
+    }
+
+    function renderCosas() {
+      const n = LUGAR_NOMBRE[lugar];
+      $('#cosasTitle').textContent = `Cosas que hay/quedaron en ${n}`;
+      const list = cosasData[lugar] || [];
+      $('#cosasList').innerHTML = list.length ? list.map(c => `
+        <div class="cosa-row">
+          ${c.foto ? `<img class="cosa-thumb" src="${c.foto}" alt="" onclick="verFoto(this.src, '${esc(c.nombre).replace(/'/g, '&#39;')}')">` : '<div class="cosa-thumb" style="cursor:default">📦</div>'}
+          <div class="cosa-info">
+            <div class="cosa-name">${esc(c.nombre)}</div>
+            <div class="cosa-loc">📍 ${c.ubicacion ? esc(c.ubicacion) : 'Sin ubicación'}</div>
+          </div>
+          <button class="mini-btn" onclick="abrirCosaForm('${c.id}')" aria-label="Editar">✎</button>
+          <button class="mini-btn" onclick="borrarCosa('${c.id}')" aria-label="Eliminar">🗑</button>
+        </div>`).join('') : `<div style="font-size:.8rem;color:var(--muted);font-style:italic;text-align:center;padding:18px 0;">Aún no hay nada registrado en ${n}.</div>`;
+    }
+
+    function setCosaPrev() {
+      const b = $('#cosaPbox'), im = b.querySelector('img');
+      im.src = cosaFoto || ''; im.style.display = cosaFoto ? 'block' : 'none';
+      b.querySelector('span').style.display = cosaFoto ? 'none' : 'block';
+      $('#cosaRm').style.display = cosaFoto ? 'grid' : 'none';
+    }
+
+    function abrirCosaForm(id) {
+      cosaEditId = id || null;
+      const c = id ? (cosasData[lugar] || []).find(x => x.id === id) : null;
+      $('#cosaFormTitle').textContent = c ? 'Editar cosa' : 'Nueva cosa';
+      $('#cosaNombre').value = c ? c.nombre : '';
+      $('#cosaUbi').value = c ? c.ubicacion : '';
+      cosaFoto = c ? c.foto || null : null;
+      setCosaPrev();
+      $('#modalCosaForm').classList.add('active');
+      setTimeout(() => $('#cosaNombre').focus(), 150);
+    }
+
+    function borrarCosa(id) {
+      if (!confirm('¿Eliminar este objeto de la lista?')) return;
+      cosasData[lugar] = (cosasData[lugar] || []).filter(x => x.id !== id);
+      saveAll(); renderCosas(); toast('Eliminado');
+    }
+
+    $('#btnCosas').onclick = () => { renderCosas(); $('#modalCosas').classList.add('active'); };
+    $('#btnAddCosa').onclick = () => abrirCosaForm();
+    $('#btnCosaCam').onclick = () => $('#cosaFileCam').click();
+    $('#btnCosaGal').onclick = () => $('#cosaFileGal').click();
+    $('#cosaRm').onclick = () => { cosaFoto = null; $('#cosaFileCam').value = ''; $('#cosaFileGal').value = ''; setCosaPrev(); };
+    [$('#cosaFileCam'), $('#cosaFileGal')].forEach(inp => inp.onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      comprimir(f, 600, d => { cosaFoto = d; setCosaPrev(); });
+      e.target.value = '';
+    });
+    $('#btnSaveCosa').onclick = () => {
+      const nombre = $('#cosaNombre').value.trim();
+      if (!nombre) return alert('Escribe el nombre del objeto');
+      vibrar();
+      const arr = cosasData[lugar] = cosasData[lugar] || [];
+      if (cosaEditId) {
+        const c = arr.find(x => x.id === cosaEditId);
+        if (c) { c.nombre = nombre; c.ubicacion = $('#cosaUbi').value.trim(); c.foto = cosaFoto; }
+      } else {
+        arr.unshift({ id: 'c_' + Date.now().toString(36), nombre, ubicacion: $('#cosaUbi').value.trim(), foto: cosaFoto });
+      }
+      saveAll(); renderCosas();
+      $('#modalCosaForm').classList.remove('active');
+      toast('Guardado');
+    };
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-close-cosa]')) $('#modalCosaForm').classList.remove('active');
+      if (e.target.closest('[data-close-viewer]')) $('#modalViewer').classList.remove('active');
+    });
+
     /* ─── CONTROL DE MODALES ─── */
     function closeModals() {
       $$('.modal-overlay').forEach(m => m.classList.remove('active'));
@@ -1291,7 +1558,10 @@
     }
 
     document.addEventListener('click', e => {
-      if (e.target.classList.contains('modal-overlay') || e.target.closest('[data-close]')) {
+      if (e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'modalCosaForm' || e.target.id === 'modalViewer') e.target.classList.remove('active');
+        else closeModals();
+      } else if (e.target.closest('[data-close]')) {
         closeModals();
       }
     });
@@ -1304,10 +1574,10 @@
     const savedTheme = localStorage.getItem(KEY_THEME) || 'dark';
     applyTheme(savedTheme);
 
-    const savedFont = localStorage.getItem(KEY_FONT) || 'fraunces';
-    setFont(savedFont);
+    setFont(localStorage.getItem(KEY_FONT) || 'fraunces', true);
+    setAcc(localStorage.getItem(KEY_ACC) || 'violeta', true);
 
-    render();
+    switchSection('renaico');
   </script>
 </body>
 </html>
