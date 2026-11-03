@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
@@ -7,12 +8,68 @@
 
   <!-- Prevención de parpadeo de tema y fuente -->
   <script>
+    /* ─── Motor de temas ───
+       Cada tema = paleta completa (fondo, tarjetas, texto, acento) con variante clara y oscura.
+       h/s = tono y saturación del fondo · a = acento [claro, oscuro] · b = acento secundario [claro, oscuro]
+       sw = círculos de muestra · g = degradado de muestra · m = modo natural del tema */
+    var EST_THEMES = [
+      { id:'rubi',    n:'Mocha rubí',              d:'rubí intenso, lavanda y café blanco',          h:342, s:34, a:['#9b2f55','#e58aa5'], b:['#7a5bb5','#c6b2ee'], sw:['#7a3149','#e7a3b5','#c8b6e2','#efe6e4','#6b4a40'], g:['#4a2236','#a24a68'], m:'dark' },
+      { id:'flores',  n:'Felicidad de las flores', d:'pétalos de rosa y burbujas de melocotón',      h:350, s:62, a:['#d02a66','#ff7ea5'], b:['#b9501f','#ffb592'], sw:['#ff5c8a','#ff9a6c','#c9b0ff','#fff0f0'],           g:['#ff5c93','#ff8a6a'], m:'light' },
+      { id:'matcha',  n:'Miel de matcha',          d:'hojas de salvia, chorrito de miel tibia',      h:140, s:26, a:['#37744f','#8fd3a2'], b:['#946400','#f3cb55'], sw:['#2f6b4f','#0d3b2e','#c79a5a','#f5c518'],           g:['#1f5a40','#e5b817'], m:'light' },
+      { id:'niebla',  n:'Niebla de lavanda',       d:'resplandor púrpura después de medianoche',     h:262, s:26, a:['#6a4cb0','#b9a0f7'], b:['#7a6a9c','#d0c8e8'], sw:['#2a2438','#4a4160','#8f86a8','#d6d0e3'],           g:['#2d2640','#cfc9dc'], m:'dark' },
+      { id:'sorbete', n:'Sorbete bañado por el sol', d:'coral, mermelada de tomate y cielo',         h:18,  s:78, a:['#cc4126','#ff8f6b'], b:['#1c7aa0','#74d2ef'], sw:['#fff1c9','#ffd27a','#ff7a59','#d63a3a','#4ec3e0'], g:['#ffc370','#e0402e'], m:'light' },
+      { id:'peonia',  n:'Latte de peonía',         d:'colorete, palo de rosa y crema de vainilla',   h:10,  s:42, a:['#b04f69','#eaa3b6'], b:['#587a48','#b9cf9f'], sw:['#fff3dc','#f6c1cf','#b1c08e','#b6bfd8'],           g:['#f0b9c8','#3b3447'], m:'light' },
+      { id:'limon',   n:'Brisa de limón',          d:'lino azul cielo, piedra lunar y azafrán',      h:195, s:42, a:['#1a7385','#72d3e3'], b:['#9a6c00','#f7c84a'], sw:['#bfe6ee','#76b9c4','#f2b83a','#1d3a40'],           g:['#a9dbe6','#e4b94a'], m:'light' },
+      { id:'acero',   n:'Acero de medianoche',     d:'noche azul tinta y niebla plateada',           h:210, s:38, a:['#2c5a85','#92bde3'], b:['#566b7b','#bac6d1'], sw:['#0e1d27','#274255','#4c6677','#9fb2bd','#c5d0d6'], g:['#0c1a24','#6f8794'], m:'dark' },
+      { id:'bryn',    n:'El hogar de Bryn',        d:'pino intenso, musgo y chocolate negro',        h:112, s:24, a:['#46692f','#a0c97e'], b:['#774526','#d6a579'], sw:['#17301c','#2e5a2a','#4f6b33','#5a3a28','#7a5a40'], g:['#1f3a1f','#6b4a30'], m:'dark' },
+      { id:'lila',    n:'Sueño diurno de lila',    d:'bruma color lavanda, convertida en luz del día.', h:265, s:46, a:['#7752d0','#ab8ffb'], b:['#86449f','#d6a9ee'], sw:['#efe7ff','#cdb9f0','#a98ad8','#7a55b8','#3d2a66'], g:['#e3d6fa','#7a55b8'], m:'light' },
+      { id:'violeta', n:'Latte violeta',           d:'flores de lila sobre crema de vainilla',       h:38,  s:55, a:['#7747b3','#bd9ef0'], b:['#8c6d1f','#edda9c'], sw:['#fff1d6','#f0dfa0','#d3b8ec','#9a6fc9','#3b2a5a'], g:['#f6e7c3','#9a6fc9'], m:'light' }
+    ];
+    var EST_ACC_MIGRA = { violeta:'lila', rosa:'peonia', celeste:'limon', agua:'matcha' };
+    function estHsl(h, s, l) { return 'hsl(' + Math.round(h) + ',' + Math.round(s) + '%,' + l + '%)'; }
+    function estLum(hex) {
+      var c = [1,3,5].map(function (i) { var v = parseInt(hex.substr(i,2),16)/255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); });
+      return .2126*c[0] + .7152*c[1] + .0722*c[2];
+    }
+    function estHue(hex) {
+      var r=parseInt(hex.substr(1,2),16)/255, g=parseInt(hex.substr(3,2),16)/255, b=parseInt(hex.substr(5,2),16)/255;
+      var mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn, h=0;
+      if (d) { h = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; if (h<0) h+=360; }
+      return h;
+    }
+    function estTheme(id) {
+      if (EST_ACC_MIGRA[id]) id = EST_ACC_MIGRA[id];
+      for (var i = 0; i < EST_THEMES.length; i++) if (EST_THEMES[i].id === id) return EST_THEMES[i];
+      return EST_THEMES[9];
+    }
+    function estApplyTheme(id, mode) {
+      var T = estTheme(id), dark = mode === 'dark', st = document.documentElement.style;
+      var p = dark ? T.a[1] : T.a[0], g = dark ? T.b[1] : T.b[0], hp = estHue(p), hg = estHue(g);
+      var sl = Math.min(T.s, 60), sd = Math.min(T.s * .6, 30);
+      var v = dark ? {
+        '--bg': estHsl(T.h, sd, 7), '--card': estHsl(T.h, sd, 10.5), '--card-elevated': estHsl(T.h, sd, 15),
+        '--border': estHsl(T.h, sd, 22), '--text': estHsl(T.h, 30, 94), '--muted': estHsl(T.h, 12, 66),
+        '--p-soft': estHsl(hp, 30, 22), '--gold-soft': estHsl(hg, 28, 20)
+      } : {
+        '--bg': estHsl(T.h, sl * .8, 96), '--card': estHsl(T.h, sl, 99), '--card-elevated': estHsl(T.h, sl * .9, 92.5),
+        '--border': estHsl(T.h, sl * .8, 85), '--text': estHsl(T.h, 38, 14), '--muted': estHsl(T.h, 14, 38),
+        '--p-soft': estHsl(hp, 60, 92), '--gold-soft': estHsl(hg, 62, 91)
+      };
+      v['--p'] = p; v['--gold'] = g;
+      v['--on-p'] = estLum(p) > .38 ? '#14121a' : '#ffffff';
+      for (var k in v) st.setProperty(k, v[k]);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.documentElement.dataset.tema = T.id;
+      var m = document.getElementById('metaThemeColor');
+      if (m) m.setAttribute('content', dark ? estHsl(T.h, sd, 7) : estHsl(T.h, sl * .8, 96));
+      return T;
+    }
     try {
       var t = localStorage.getItem('estacion_tema') || 'dark';
       var d = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
-      document.documentElement.dataset.theme = d ? 'dark' : 'light';
-      var a = localStorage.getItem('estacion_acento') || 'violeta';
-      document.documentElement.dataset.acc = ['violeta','rosa','celeste','agua'].indexOf(a) > -1 ? a : 'violeta';
+      var a = localStorage.getItem('estacion_acento') || 'lila';
+      var tid = estTheme(a).id;
+      estApplyTheme(tid, d ? 'dark' : 'light');
       var f = localStorage.getItem('estacion_fuente_titulos') || 'fraunces';
       var F = {
         fraunces: "'Fraunces', Georgia, serif",
@@ -230,7 +287,7 @@
     }
     .search-box:focus-within {
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 22%, transparent);
     }
     .search-input {
       flex: 1;
@@ -425,15 +482,12 @@
       border-radius: 6px;
       background: var(--gold-soft);
       color: var(--gold);
-      border: 1px solid rgba(212, 175, 55, 0.22);
+      border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
       font-weight: 600;
       max-width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-    [data-theme="dark"] .task-summary-pill {
-      background: rgba(212, 175, 55, 0.1);
     }
 
     .task-arrow {
@@ -444,28 +498,39 @@
     }
 
     /* ─── Botón Flotante y Barra Inferior ─── */
-    .fab {
+    /* Dos botones flotantes distintos: Categorías (izq.) y Agregar tarea (der.) */
+    .fab-bar {
       position: fixed;
       z-index: 30;
-      right: max(16px, calc(50% - 240px));
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(100%, 520px);
+      padding: 0 16px;
       bottom: calc(76px + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .fab-bar > * { pointer-events: auto; }
+    .fab, .fab-cat {
       height: 50px;
       padding: 0 18px;
       border-radius: 16px;
-      background: var(--p);
-      color: #fff;
-      border: none;
       font-weight: 800;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.28);
       cursor: pointer;
       font-family: inherit;
       transition: transform 0.14s ease;
     }
-    .fab:active { transform: scale(0.95); }
+    .fab { background: var(--p); color: #fff; border: none; }
+    .fab-cat { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
+    .fab:active, .fab-cat:active { transform: scale(0.95); }
 
     .bottom-nav {
       position: fixed;
@@ -646,16 +711,8 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-    /* ─── Colores de acento ─── */
+    /* ─── Temas: las variables (--bg, --p, etc.) las pone estApplyTheme() ─── */
     :root { --on-p: #fff; }
-    [data-acc=violeta] { --p:#7c5cd6; --p-soft:#ece6fb; --on-p:#fff; }
-    [data-theme=dark][data-acc=violeta] { --p:#a78bfa; --p-soft:#2b2445; --on-p:#14121a; }
-    [data-acc=rosa] { --p:#c2417a; --p-soft:#fbe1ec; --on-p:#fff; }
-    [data-theme=dark][data-acc=rosa] { --p:#f472b6; --p-soft:#40202f; --on-p:#14121a; }
-    [data-acc=celeste] { --p:#3b82c4; --p-soft:#dcebf8; --on-p:#fff; }
-    [data-theme=dark][data-acc=celeste] { --p:#7cb7ff; --p-soft:#1b2c44; --on-p:#14121a; }
-    [data-acc=agua] { --p:#2f8a76; --p-soft:#d9f0ea; --on-p:#fff; }
-    [data-theme=dark][data-acc=agua] { --p:#5eead4; --p-soft:#173b36; --on-p:#14121a; }
     .fab, .btn-primary { color: var(--on-p) !important; }
 
     /* Título con selector de lugar */
@@ -671,13 +728,27 @@
     .dropdown-menu .menu-item { width:100%; text-align:left; border:none; background:transparent; color:var(--text); padding:10px 12px; border-radius:10px; font-size:.86rem; font-weight:700; cursor:pointer; font-family:inherit; }
     .dropdown-menu .menu-item:hover { background: var(--card-elevated); }
     .dropdown-menu hr { border:0; border-top:1px dashed var(--border); margin:6px 4px; }
-    .dots { display:flex; gap:10px; padding:6px 12px 10px; }
-    .dots button { width:32px; height:32px; border-radius:50%; border:2px solid transparent; display:grid; place-items:center; color:#fff; font-size:.85rem; background:var(--c); cursor:pointer; }
-    .dots button[data-c=violeta]{--c:#7c5cd6}.dots button[data-c=rosa]{--c:#c2417a}.dots button[data-c=celeste]{--c:#3b82c4}.dots button[data-c=agua]{--c:#2f8a76}
-    [data-theme=dark] .dots button[data-c=violeta]{--c:#a78bfa}[data-theme=dark] .dots button[data-c=rosa]{--c:#f472b6}[data-theme=dark] .dots button[data-c=celeste]{--c:#7cb7ff}[data-theme=dark] .dots button[data-c=agua]{--c:#5eead4}
-    [data-theme=dark] .dots button{color:#14121a}
-    .dots button.on { border-color: var(--text); }
-    .dots button.on::after { content:"✓"; font-weight:800; }
+    /* Selector de temas */
+    .theme-list { display:flex; flex-direction:column; gap:6px; }
+    .theme-row { display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:10px; border-radius:18px; border:2px solid transparent; background:transparent; color:var(--text); cursor:pointer; font-family:inherit; transition: background .15s, border-color .15s; }
+    .theme-row:hover { background: var(--card-elevated); }
+    .theme-row.on { border-color: var(--p); background: var(--p-soft); }
+    .theme-swatch { position:relative; width:64px; height:52px; border-radius:14px; flex-shrink:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+    .theme-dots { position:absolute; left:4px; bottom:4px; display:flex; }
+    .theme-dots i { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,.92); margin-right:-6px; box-shadow:0 0 0 1px rgba(0,0,0,.18); }
+    .theme-name { font-family: var(--font-title), Georgia, serif; font-weight:700; font-size:1rem; line-height:1.2; }
+    .theme-desc { font-size:.78rem; color:var(--muted); margin-top:3px; line-height:1.3; }
+    .theme-info { min-width:0; flex:1; }
+
+    /* Gestor de categorías */
+    .catm-row { display:flex; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid rgba(128,128,128,.12); }
+    .catm-row:last-child { border-bottom:none; }
+    .catm-info { flex:1; min-width:0; }
+    .catm-name { font-family: var(--font-title), Georgia, serif; font-weight:700; font-size:.92rem; word-break:break-word; }
+    .catm-meta { font-size:.72rem; color:var(--muted); margin-top:2px; }
+    .mini-btn:disabled { opacity:.3; cursor:default; }
+    .cat-foot { display:flex; justify-content:flex-end; gap:6px; margin-top:6px; }
+    .cat-foot button { font-size:.72rem; background:none; border:none; cursor:pointer; padding:4px 6px; font-family:inherit; font-weight:600; }
 
     /* Checks circulares */
     .task-checkbox { width: 22px; height: 22px; border-radius: 50%; margin-top: 1px; }
@@ -731,13 +802,7 @@
           <button class="font-btn" data-f="chivo" style="font-family:'Chivo', sans-serif;">Chivo</button>
           <button class="font-btn" data-f="space" style="font-family:'Space Grotesk', sans-serif;">Space Grotesk</button>
           <hr>
-          <div class="dropdown-header">Color de acento</div>
-          <div class="dots" id="dots">
-            <button data-c="violeta" aria-label="Morado"></button>
-            <button data-c="rosa" aria-label="Rosa"></button>
-            <button data-c="celeste" aria-label="Celeste"></button>
-            <button data-c="agua" aria-label="Aguamarina"></button>
-          </div>
+          <button class="menu-item" id="btnTemas">🎨 Temas <span id="temaActual" style="font-weight:600;color:var(--muted);font-size:.78rem;"></span></button>
         </div>
       </div>
     </header>
@@ -774,19 +839,17 @@
 
     <!-- Contenedor dinámico de Categorías y Tareas -->
     <main id="mainContentArea"></main>
-
-    <!-- Botón para añadir nueva categoría -->
-    <div style="margin-top: 14px;">
-      <button class="btn btn-secondary" style="width:100%;border-style:dashed;padding:10px;" id="btnAddCategory">
-        ＋ Nueva categoría
-      </button>
-    </div>
   </div>
 
-  <!-- Botón flotante ＋ Agregar Tarea -->
-  <button class="fab" id="btnFabAdd">
-    <span style="font-size:1.15rem;line-height:1">＋</span> Agregar
-  </button>
+  <!-- Botones flotantes: Categorías (gestor) y Agregar tarea, independientes -->
+  <div class="fab-bar">
+    <button class="fab-cat" id="btnCatManager" aria-label="Administrar categorías">
+      <span style="font-size:1.05rem;line-height:1">🗂️</span> Categorías
+    </button>
+    <button class="fab" id="btnFabAdd">
+      <span style="font-size:1.15rem;line-height:1">＋</span> <span id="fabAddTxt">Agregar tarea</span>
+    </button>
+  </div>
 
   <!-- Barra de Navegación Inferior -->
   <nav class="bottom-nav">
@@ -868,12 +931,35 @@
     </div>
   </div>
 
-  <!-- Modal: Crear Categoría -->
-  <div class="modal-overlay" id="modalCategory">
+  <!-- Modal: Gestor de categorías (añadir, editar, ordenar, eliminar) -->
+  <div class="modal-overlay mini-modal" id="modalCatManager">
     <div class="modal-card">
       <div class="modal-head">
-        <h3 class="font-title" style="font-size:1.18rem;">Nueva Categoría</h3>
+        <h3 class="font-title" style="font-size:1.1rem;" id="catMgrTitle">Categorías</h3>
         <button class="modal-close-btn" data-close>✕</button>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" id="btnAddCategory">＋ Nueva categoría</button>
+      <div id="catMgrList"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Temas -->
+  <div class="modal-overlay" id="modalTemas">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.18rem;">Temas</h3>
+        <button class="modal-close-btn" data-close>✕</button>
+      </div>
+      <div class="theme-list" id="themeList"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Crear / editar Categoría -->
+  <div class="modal-overlay" id="modalCategory" style="z-index:110;">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="font-title" style="font-size:1.18rem;" id="catFormTitle">Nueva Categoría</h3>
+        <button class="modal-close-btn" data-close-cat>✕</button>
       </div>
 
       <div class="form-group">
@@ -889,7 +975,7 @@
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
-        <button class="btn btn-secondary" data-close>Cancelar</button>
+        <button class="btn btn-secondary" data-close-cat>Cancelar</button>
         <button class="btn btn-primary" id="btnSaveCategory">Crear</button>
       </div>
     </div>
@@ -1046,12 +1132,13 @@
     }
 
     /* ─── TEMA CLARO / OSCURO ─── */
+    let temaId = estTheme(leerLSsafe(KEY_ACC, 'lila')).id;
+    function leerLSsafe(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
+
     function applyTheme(themeName) {
-      document.documentElement.dataset.theme = themeName;
-      localStorage.setItem(KEY_THEME, themeName);
-      const isDark = themeName === 'dark';
-      $('#btnThemeToggle').textContent = isDark ? '☀️' : '🌙';
-      $('#metaThemeColor').setAttribute('content', isDark ? '#0e0d13' : '#fbf5ee');
+      try { localStorage.setItem(KEY_THEME, themeName); } catch (e) {}
+      estApplyTheme(temaId, themeName);          // repinta toda la paleta del tema en modo claro/oscuro
+      $('#btnThemeToggle').textContent = themeName === 'dark' ? '☀️' : '🌙';
     }
 
     $('#btnThemeToggle').onclick = () => {
@@ -1078,12 +1165,43 @@
       if (!silent) toast('Letra actualizada');
     }
 
-    function setAcc(a, silent) {
-      if (!['violeta', 'rosa', 'celeste', 'agua'].includes(a)) a = 'violeta';
-      try { localStorage.setItem(KEY_ACC, a); } catch (e) {}
-      document.documentElement.dataset.acc = a;
-      $$('#dots button').forEach(b => b.classList.toggle('on', b.dataset.c === a));
+    /* ─── TEMAS ─── */
+    function renderTemas() {
+      $('#themeList').innerHTML = EST_THEMES.map(t => `
+        <button class="theme-row ${t.id === temaId ? 'on' : ''}" data-tema="${t.id}">
+          <span class="theme-swatch" style="background:linear-gradient(135deg, ${t.g[0]}, ${t.g[1]});">
+            <span class="theme-dots">${t.sw.map(c => `<i style="background:${c}"></i>`).join('')}</span>
+          </span>
+          <span class="theme-info">
+            <span class="theme-name" style="display:block">${esc(t.n)}</span>
+            <span class="theme-desc" style="display:block">${esc(t.d)}</span>
+          </span>
+        </button>`).join('');
+      $('#temaActual').textContent = '· ' + estTheme(temaId).n;
     }
+
+    function setTema(id, silent) {
+      const T = estTheme(id);
+      temaId = T.id;
+      try { localStorage.setItem(KEY_ACC, temaId); } catch (e) {}
+      if (!silent) {
+        // Al elegir un tema se adopta su modo natural (claro u oscuro); el botón ☀️/🌙 lo puede invertir.
+        applyTheme(T.m);
+        toast('Tema: ' + T.n);
+      } else {
+        estApplyTheme(temaId, document.documentElement.dataset.theme);
+      }
+      renderTemas();
+    }
+
+    $('#themeList').addEventListener('click', e => {
+      const r = e.target.closest('[data-tema]'); if (r) { vibrar(); setTema(r.dataset.tema); }
+    });
+    $('#btnTemas').onclick = () => {
+      renderTemas();
+      $('#modalTemas').classList.add('active');
+      setTimeout(() => { const on = $('#themeList .on'); if (on) on.scrollIntoView({ block: 'center' }); }, 60);
+    };
 
     $('#btnMenu').onclick = e => {
       e.stopPropagation();
@@ -1092,8 +1210,7 @@
     $('#fontDropdown').addEventListener('click', e => {
       e.stopPropagation();
       const f = e.target.closest('.font-btn'); if (f) setFont(f.dataset.f);
-      const d = e.target.closest('#dots button'); if (d) setAcc(d.dataset.c);
-      if (e.target.closest('#btnExport') || e.target.closest('#btnImport')) $('#fontDropdown').classList.remove('open');
+      if (e.target.closest('#btnExport') || e.target.closest('#btnImport') || e.target.closest('#btnTemas')) $('#fontDropdown').classList.remove('open');
     });
     document.addEventListener('click', () => $('#fontDropdown').classList.remove('open'));
 
@@ -1106,6 +1223,7 @@
       $('#headerSubtitle').textContent = isRen ? 'Resumen & detalle para no olvidar nada' : 'No olvidar';
       $('#cosasBtnTxt').textContent = `📦 Cosas que hay/quedaron en ${LUGAR_NOMBRE[lugar]}`;
       $('#btnCosas').style.display = isRen ? 'flex' : 'none';
+      $('#fabAddTxt').textContent = isRen ? 'Agregar tarea' : 'Agregar apunte';
     }
 
     function switchSection(sec) {
@@ -1204,15 +1322,19 @@
                   <span class="task-arrow">›</span>
                 </div>
               `).join('')}
-              <div style="display:flex;justify-content:flex-end;margin-top:6px;">
-                <button onclick="confirmDeleteCat('${cat.key}')" style="font-size:0.72rem;color:var(--rose);background:none;border:none;cursor:pointer;padding:4px 6px;">
-                  Eliminar categoría
-                </button>
+              <div class="cat-foot">
+                <button onclick="openCategoryForm('${cat.key}')" style="color:var(--p);">✎ Editar categoría</button>
+                <button onclick="confirmDeleteCat('${cat.key}')" style="color:var(--rose);">Eliminar categoría</button>
               </div>
             </div>
           </div>
         `;
       });
+
+      if (!categories.length) {
+        html = `<div style="text-align:center;padding:36px 12px;color:var(--muted);font-size:.85rem;line-height:1.5;">
+          Aún no hay categorías en esta sección.<br>Toca <b>🗂️ Categorías</b> para crear la primera.</div>`;
+      }
 
       $('#mainContentArea').innerHTML = html;
       updatePackingProgress();
@@ -1342,31 +1464,77 @@
     };
 
     /* ─── CREAR Y ELIMINAR CATEGORÍAS ─── */
-    $('#btnAddCategory').onclick = () => {
-      $('#inpCatName').value = '';
-      $('#inpCatPacking').checked = false;
+    let editingCatKey = null;
+
+    /* Gestor: lista con ↑ ↓ ✎ 🗑 por categoría y botón ＋ Nueva categoría */
+    function renderCatManager() {
+      const cats = getCategories();
+      const esRen = currentSection === 'renaico';
+      $('#catMgrTitle').textContent = 'Categorías · ' + (esRen ? 'Traslado' : 'Instituto');
+      $('#catMgrList').innerHTML = cats.length ? cats.map((c, i) => {
+        const n = (appData[currentSection] || []).filter(x => x.cat === c.key).length;
+        const meta = `${n} ${esRen ? (n === 1 ? 'tarea' : 'tareas') : (n === 1 ? 'apunte' : 'apuntes')}${esRen && c.packing ? ' · cuenta para el equipaje' : ''}`;
+        return `
+        <div class="catm-row">
+          <div class="catm-info">
+            <div class="catm-name">${esc(c.name)}</div>
+            <div class="catm-meta">${meta}</div>
+          </div>
+          <button class="mini-btn" onclick="moveCat('${c.key}',-1)" aria-label="Subir" ${i === 0 ? 'disabled' : ''}>↑</button>
+          <button class="mini-btn" onclick="moveCat('${c.key}',1)" aria-label="Bajar" ${i === cats.length - 1 ? 'disabled' : ''}>↓</button>
+          <button class="mini-btn" onclick="openCategoryForm('${c.key}')" aria-label="Editar">✎</button>
+          <button class="mini-btn" onclick="confirmDeleteCat('${c.key}')" aria-label="Eliminar">🗑</button>
+        </div>`;
+      }).join('') : `<div style="font-size:.8rem;color:var(--muted);font-style:italic;text-align:center;padding:18px 0;">Aún no hay categorías. Crea la primera.</div>`;
+    }
+
+    function moveCat(key, dir) {
+      const arr = catData[currentSection];
+      const i = arr.findIndex(c => c.key === key), j = i + dir;
+      if (i < 0 || j < 0 || j >= arr.length) return;
+      vibrar();
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      saveAll(); render(); renderCatManager();
+    }
+
+    $('#btnCatManager').onclick = () => { renderCatManager(); $('#modalCatManager').classList.add('active'); };
+
+    /* Formulario único para crear (sin key) o editar (con key) una categoría */
+    function openCategoryForm(key) {
+      editingCatKey = (typeof key === 'string') ? key : null;
+      const c = editingCatKey ? getCategories().find(x => x.key === editingCatKey) : null;
+      $('#catFormTitle').textContent = c ? 'Editar Categoría' : 'Nueva Categoría';
+      $('#btnSaveCategory').textContent = c ? 'Guardar' : 'Crear';
+      $('#inpCatName').value = c ? c.name : '';
+      $('#inpCatPacking').checked = c ? !!c.packing : false;
       $('#groupPackingCheckbox').style.display = currentSection === 'renaico' ? 'block' : 'none';
       $('#modalCategory').classList.add('active');
       setTimeout(() => $('#inpCatName').focus(), 150);
-    };
+    }
+
+    $('#btnAddCategory').onclick = () => openCategoryForm();
 
     $('#btnSaveCategory').onclick = () => {
       const name = $('#inpCatName').value.trim();
       if (!name) return alert('Ingresa un nombre para la categoría');
 
       vibrar();
-      const newCat = {
-        key: 'cat_' + Date.now().toString(36),
-        name: name,
-        packing: currentSection === 'renaico' && $('#inpCatPacking').checked
-      };
-
-      catData[currentSection].push(newCat);
-      openCats[newCat.key] = true;
+      const packing = currentSection === 'renaico' && $('#inpCatPacking').checked;
+      const c = editingCatKey ? getCategories().find(x => x.key === editingCatKey) : null;
+      if (c) {
+        c.name = name;
+        c.packing = packing;
+      } else {
+        const newCat = { key: 'cat_' + Date.now().toString(36), name, packing };
+        catData[currentSection].push(newCat);
+        openCats[newCat.key] = true;
+      }
       saveAll();
-      closeModals();
+      $('#modalCategory').classList.remove('active');
       render();
-      toast('Categoría creada');
+      renderCatManager();
+      toast(c ? 'Categoría actualizada' : 'Categoría creada');
+      editingCatKey = null;
     };
 
     function confirmDeleteCat(key) {
@@ -1379,6 +1547,7 @@
         appData[currentSection] = appData[currentSection].filter(x => x.cat !== key);
         saveAll();
         render();
+        renderCatManager();
         toast('Categoría eliminada');
       }
     }
@@ -1553,6 +1722,7 @@
     document.addEventListener('click', e => {
       if (e.target.closest('[data-close-cosa]')) $('#modalCosaForm').classList.remove('active');
       if (e.target.closest('[data-close-viewer]')) $('#modalViewer').classList.remove('active');
+      if (e.target.closest('[data-close-cat]')) $('#modalCategory').classList.remove('active');
     });
 
     /* ─── CONTROL DE MODALES ─── */
@@ -1563,7 +1733,7 @@
 
     document.addEventListener('click', e => {
       if (e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'modalCosaForm' || e.target.id === 'modalViewer') e.target.classList.remove('active');
+        if (e.target.id === 'modalCosaForm' || e.target.id === 'modalViewer' || e.target.id === 'modalCategory') e.target.classList.remove('active');
         else closeModals();
       } else if (e.target.closest('[data-close]')) {
         closeModals();
@@ -1575,13 +1745,15 @@
     });
 
     /* ─── INICIALIZACIÓN ─── */
-    const savedTheme = localStorage.getItem(KEY_THEME) || 'dark';
+    const savedTheme = localStorage.getItem(KEY_THEME) === 'light' ? 'light' : 'dark';
     applyTheme(savedTheme);
 
     setFont(localStorage.getItem(KEY_FONT) || 'fraunces', true);
-    setAcc(localStorage.getItem(KEY_ACC) || 'violeta', true);
+    setTema(temaId, true);   // también migra el acento viejo (violeta/rosa/celeste/agua) al tema equivalente
 
     switchSection('renaico');
   </script>
 </body>
 </html>
+
+</body></html>
